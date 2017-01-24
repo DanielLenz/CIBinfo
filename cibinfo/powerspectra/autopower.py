@@ -84,7 +84,7 @@ class Planck2014(AutoPowerspectrum):
     def __init__(self, freq1, freq2=None, unit='Jy^2/sr'):
         super(Planck2014, self).__init__(freq1, freq2=freq2, unit=unit)
 
-        self.Cl_contains_SN = True
+        self.Cl_contains_SN = False
 
     # properties
     ###########################################################################

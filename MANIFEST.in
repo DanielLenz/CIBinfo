@@ -6,6 +6,7 @@ include HISTORY.rst
 include LICENSE
 include README.rst
 include cibinfo/resources/paolo_models/cib_all_spectra_l3000.txt
+include cibinfo/resources/planck_2014_XXX/all_best_fit.txt
 include cibinfo/resources/lensing_HOD/*.txt
 
 recursive-include cibinfo/ *.py
