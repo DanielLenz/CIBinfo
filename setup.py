@@ -28,7 +28,6 @@ setup(
     packages=[
         'cibinfo',
         'cibinfo.utils',
-        'cibinfo.meanlevel',
         'cibinfo.powerspectra',
     ],
     package_dir={'cibinfo':

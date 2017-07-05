@@ -1,3 +1,6 @@
+from __future__ import (absolute_import, division, print_function,
+                        unicode_literals)
+
 import os
 
 PACKAGE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -9,7 +12,6 @@ K2Jy = {
     '217': 483.690e6,
     '353': 287.450e6,
     '545': 58.04e6,
-    '857': 2.27e6,
-    }
+    '857': 2.27e6, }
 
-Jy2K = {k: 1./v for k, v in iter(K2Jy.items())}
+Jy2K = {k: 1. / v for k, v in iter(K2Jy.items())}

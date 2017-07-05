@@ -7,7 +7,7 @@ import os
 from .. import this_project as P
 
 
-class AutoPowerspectrum():
+class AutoPowerspectrum(object):
 
     _l = None  # multipole
     _Cl = None  # angular power
@@ -36,8 +36,7 @@ class AutoPowerspectrum():
     def freqstr(self):
         self._freqstr = 'x'.join((
             str(max([self.freq1, self.freq2])),
-            str(min([self.freq1, self.freq2]))
-            ))
+            str(min([self.freq1, self.freq2]))))
         return self._freqstr
 
     @property
@@ -57,7 +56,7 @@ class AutoPowerspectrum():
     @property
     def Dl(self):
         if self._Dl is None:
-            self._Dl = l*(l+1.)/2./np.pi * self.Cl
+            self._Dl = l * (l + 1.) / 2. / np.pi * self.Cl
         return self._Dl
 
     @property
@@ -93,8 +92,7 @@ class Planck2014(AutoPowerspectrum):
         if self._raw_table is None:
             self._raw_table = np.loadtxt(os.path.join(
                 P.PACKAGE_DIR,
-                'resources/planck_2014_XXX/all_best_fit.txt'
-                ))
+                'resources/planck_2014_XXX/all_best_fit.txt'))
         return self._raw_table
 
     @property
@@ -102,10 +100,13 @@ class Planck2014(AutoPowerspectrum):
         if self._Cl is None:
             # native unit is Jy^2/sr
             self._Cl = self.raw_table[:, self._freq2col(self.freqstr)].copy()
+
+            # unit conversions
             if self.unit == 'K^2*sr':
                 self._Cl *= (
                     self.Jy2K[str(self.freq1)] *
                     self.Jy2K[str(self.freq2)])
+
         return self._Cl
 
     @property
@@ -132,12 +133,20 @@ class Planck2014(AutoPowerspectrum):
                 '3000x353': 411,
                 '3000x217': 95,
             }
+
+            # unit conversions
+            if self.unit == 'K^2*sr':
+                self._S *= (
+                    self.Jy2K[str(self.freq1)] *
+                    self.Jy2K[str(self.freq2)])
+
         return self._S[self.freqstr]
 
     @property
     def dS(self):
         """
-        Shot noise
+        Shot noise uncertainties
+        Units are Jy^2/sr
         """
         if self._dS is None:
             self._dS = {
@@ -150,13 +159,20 @@ class Planck2014(AutoPowerspectrum):
                 '857x353': 54,
                 '857x217': 6,
                 '545x353': 19,
-                '545x217':  6,
-                '353x217':  3,
+                '545x217': 6,
+                '353x217': 3,
                 '3000x857': 443,
                 '3000x545': 176,
                 '3000x353': 48,
                 '3000x217': 11,
             }
+
+            # unit conversions
+            if self.unit == 'K^2*sr':
+                self._dS *= (
+                    self.Jy2K[str(self.freq1)] *
+                    self.Jy2K[str(self.freq2)])
+
         return self._dS[self.freqstr]
 
     # methods
@@ -201,33 +217,31 @@ class PaoloModel(AutoPowerspectrum):
         self.Cl_contains_SN = True
 
     # properties
-    ###########################################################################
+    ############
     @property
     def raw_table(self):
         if self._raw_table is None:
             self._raw_table = np.loadtxt(os.path.join(
                 P.PACKAGE_DIR,
-                'resources/paolo_models/cib_all_spectra_l3000.txt'
-                ))
+                'resources/paolo_models/cib_all_spectra_l3000.txt'))
         return self._raw_table
 
     @property
     def Cl(self):
         if self._Cl is None:
-            # native unit is be Jy^2/sr
+            # native unit is Jy^2/sr
             self._Cl = self.raw_table[:, self._freq2col(self.freqstr)].copy()
-            # from muK^2*sr to K^2*sr
-            # self._Cl /= 1.e12
-            # if self.unit == 'Jy^2/sr':
-            #     self._Cl *= (
-            #         self.K2Jy[str(self.freq1)] *
-            #         self.K2Jy[str(self.freq2)]
-            #         )
-            #
+
+            # unit conversions
+            if self.unit == 'K^2*sr':
+                self._Cl *= (
+                    self.Jy2K[str(self.freq1)] *
+                    self.Jy2K[str(self.freq2)])
+
         return self._Cl
 
     # methods
-    ###########################################################################
+    #########
     def _freq2col(self, freqstr):
         # l, 353x353, 353x545, 353x857, 545x545, 545x857, 857x857
         mapping = {
