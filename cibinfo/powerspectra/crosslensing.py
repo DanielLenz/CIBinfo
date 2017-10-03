@@ -20,8 +20,8 @@ class CrossPowerspectrum():
     _raw_table = None  # raw table, taken from publications, emails, etc
 
     def __init__(self, freq, unit='Jy'):
-        if unit not in ['Jy', 'uK*sr']:
-            raise ValueError('Unit must be either "Jy" or "K*sr"')
+        if unit not in ['Jy', 'uK.sr']:
+            raise ValueError('Unit must be either "Jy" or "uK.sr"')
         self.unit = unit
 
         self.freq = freq
@@ -85,7 +85,7 @@ class CrossPowerspectrum():
 
 
 class Planck2013(CrossPowerspectrum):
-    def __init__(self, freq, unit='uK*sr'):
+    def __init__(self, freq, unit='uK.sr'):
         super(Planck2013, self).__init__(freq, unit=unit)
 
     # properties
@@ -141,6 +141,6 @@ class Model(CrossPowerspectrum):
             # native unit is uK*sr
             self._l3Cl = self.raw_table[:, 1].copy()
 
-            if self.unit == 'uK*sr':
+            if self.unit == 'uK.sr':
                 self._l3Cl *= self.Jy2K[self.freqstr] * 1.e6
         return self._l3Cl
