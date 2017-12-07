@@ -20,8 +20,8 @@ class CrossPowerspectrum():
     _raw_table = None  # raw table, taken from publications, emails, etc
 
     def __init__(self, freq, unit='Jy'):
-        if unit not in ['Jy', 'uK.sr']:
-            raise ValueError('Unit must be either "Jy" or "uK.sr"')
+        if unit not in ['Jy', 'MJy', 'uK.sr']:
+            raise ValueError('Unit must be either "Jy", "MJy", or "uK.sr"')
         self.unit = unit
 
         self.freq = freq
@@ -38,12 +38,6 @@ class CrossPowerspectrum():
         if self._l is None:
             self._l = self.raw_table[:, 0]
         return self._l
-
-    @property
-    def l3Cl(self):
-        if self._l3Cl is None:
-            self._l3Cl = self.l**3 * self.Cl
-        return self._l3Cl
 
     @property
     def Jy2K(self):
@@ -107,7 +101,17 @@ class Planck2013(CrossPowerspectrum):
 
             if self.unit == 'Jy':
                 self._l3Cl *= self.K2Jy[self.freqstr] / 1.e6
+            if self.unit == 'MJy':
+                self._l3Cl *= self.K2Jy[self.freqstr] / 1.e12
+
         return self._l3Cl
+
+    @property
+    def Cl(self):
+        if self._Cl is None:
+            self._Cl = self.l3Cl / self.l**3
+
+        return self._Cl
 
     @property
     def dl3Cl(self):
@@ -117,7 +121,16 @@ class Planck2013(CrossPowerspectrum):
 
             if self.unit == 'Jy':
                 self._dl3Cl *= self.K2Jy[self.freqstr] / 1.e6
+            if self.unit == 'MJy':
+                self._dl3Cl *= self.K2Jy[self.freqstr] / 1.e12
         return self._dl3Cl
+
+    @property
+    def dCl(self):
+        if self._dCl is None:
+            self._dCl = self.dl3Cl / self.l**3
+
+        return self._dCl
 
 
 class Model(CrossPowerspectrum):
@@ -138,9 +151,18 @@ class Model(CrossPowerspectrum):
     @property
     def l3Cl(self):
         if self._l3Cl is None:
-            # native unit is uK*sr
+            # native unit is Jy
             self._l3Cl = self.raw_table[:, 1].copy()
 
             if self.unit == 'uK.sr':
                 self._l3Cl *= self.Jy2K[self.freqstr] * 1.e6
+            if self.unit == 'MJy':
+                self._l3Cl /= 1.e6
+
         return self._l3Cl
+
+    @property
+    def Cl(self):
+        if self._Cl is None:
+            self._Cl = self.l3Cl / self.l**3
+        return self._Cl

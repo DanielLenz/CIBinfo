@@ -20,7 +20,7 @@ class AutoPowerspectrum():
     _raw_table = None  # raw table, taken from publications, emails, etc
 
     def __init__(self, freq1, freq2=None, unit='Jy^2/sr'):
-        if unit not in ['Jy^2/sr', 'K^2.sr']:
+        if unit not in ['Jy^2/sr', 'MJy^2/sr', 'K^2.sr']:
             raise ValueError('Unit must be either "Jy^2/sr" or "K^2.sr"')
         self.unit = unit
 
@@ -102,10 +102,15 @@ class Planck2014(AutoPowerspectrum):
         if self._Cl is None:
             # native unit is Jy^2/sr
             self._Cl = self.raw_table[:, self._freq2col(self.freqstr)].copy()
+
             if self.unit == 'K^2*sr':
                 self._Cl *= (
                     self.Jy2K[str(self.freq1)] *
                     self.Jy2K[str(self.freq2)])
+
+            if self.unit == 'MJy^2/sr':
+                self._Cl /= 1.e12
+
         return self._Cl
 
     @property
@@ -132,6 +137,15 @@ class Planck2014(AutoPowerspectrum):
                 '3000x353': 411,
                 '3000x217': 95,
             }
+
+            if self.unit == 'K^2*sr':
+                self._S *= (
+                    self.Jy2K[str(self.freq1)] *
+                    self.Jy2K[str(self.freq2)])
+
+            if self.unit == 'MJy^2/sr':
+                self._S /= 1.e12
+
         return self._S[self.freqstr]
 
     @property
@@ -157,6 +171,14 @@ class Planck2014(AutoPowerspectrum):
                 '3000x353': 48,
                 '3000x217': 11,
             }
+            if self.unit == 'K^2*sr':
+                self._dS *= (
+                    self.Jy2K[str(self.freq1)] *
+                    self.Jy2K[str(self.freq2)])
+
+            if self.unit == 'MJy^2/sr':
+                self._dS /= 1.e12
+
         return self._dS[self.freqstr]
 
     # methods
@@ -219,11 +241,13 @@ class PaoloModel(AutoPowerspectrum):
 
             # Possibly convert the units
             if self.unit == 'K^2.sr':
-
                 self._Cl *= (
                     self.Jy2K[str(self.freq1)] *
                     self.Jy2K[str(self.freq2)]
                     )
+
+            if self.unit == 'MJy^2/sr':
+                self._Cl /= 1.e12
 
         return self._Cl
 
