@@ -166,3 +166,53 @@ class Model(CrossPowerspectrum):
         if self._Cl is None:
             self._Cl = self.l3Cl / self.l**3
         return self._Cl
+
+
+class AbhiModel(CrossPowerspectrum):
+    def __init__(self, freq, unit='Jy'):
+        super(AbhiModel, self).__init__(freq, unit=unit)
+
+    # properties
+    ###########################################################################
+    @property
+    def raw_table(self):
+        if self._raw_table is None:
+            self._raw_table = np.loadtxt(
+                os.path.join(
+                    P.PACKAGE_DIR,
+                    'resources/cibxphi/abhimodel.dat'))
+        return self._raw_table
+
+    @property
+    def l3Cl(self):
+        if self._l3Cl is None:
+            # native unit is Jy
+            self._l3Cl = self.raw_table[:, self._freq2col(self.freqstr)].copy()
+
+            if self.unit == 'uK.sr':
+                self._l3Cl *= self.Jy2K[self.freqstr] * 1.e6
+            if self.unit == 'MJy':
+                self._l3Cl /= 1.e6
+
+        return self._l3Cl
+
+    @property
+    def Cl(self):
+        if self._Cl is None:
+            self._Cl = self.l3Cl / self.l**3
+        return self._Cl
+
+    # methods
+    ###########################################################################
+    def _freq2col(self, freqstr):
+        # ell, Phix100, Phix143, Phix217, Phix353, Phix545, Phix857
+        mapping = {
+            '100': 1,
+            '143': 2,
+            '217': 3,
+            '353': 4,
+            '545': 5,
+            '857': 6,
+        }
+
+        return mapping[self.freqstr]
