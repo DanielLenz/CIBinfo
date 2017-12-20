@@ -30,7 +30,7 @@ class AutoPowerspectrum():
         else:
             self.freq2 = freq2
 
-    # properties
+    # Properties
     ###########################################################################
     @property
     def freqstr(self):
@@ -86,7 +86,7 @@ class Planck2014(AutoPowerspectrum):
 
         self.Cl_contains_SN = False
 
-    # properties
+    # Properties
     ###########################################################################
     @property
     def raw_table(self):
@@ -222,7 +222,7 @@ class PaoloModel(AutoPowerspectrum):
 
         self.Cl_contains_SN = True
 
-    # properties
+    # Properties
     ###########################################################################
     @property
     def raw_table(self):
@@ -262,6 +262,57 @@ class PaoloModel(AutoPowerspectrum):
             '545x545': 4,
             '857x545': 5,
             '857x857': 6,
+        }
+
+        return mapping[self.freqstr]
+
+
+class AbhiModel(AutoPowerspectrum):
+    def __init__(self, freq1, freq2=None, unit='Jy^2/sr'):
+        super(AbhiModel, self).__init__(freq1, freq2=freq2, unit=unit)
+
+        self.Cl_contains_SN = True
+        self.Cl_contains_1halo = True
+
+    # Properties
+    ###########################################################################
+    @property
+    def raw_table(self):
+        if self._raw_table is None:
+            self._raw_table = np.loadtxt(os.path.join(
+                P.PACKAGE_DIR,
+                'resources/cibxcib/abhimodel_cibxcib.dat'
+                ))
+        return self._raw_table
+
+    @property
+    def Cl(self):
+        if self._Cl is None:
+            # native unit is be Jy^2/sr
+            self._Cl = self.raw_table[:, self._freq2col(self.freqstr)].copy()
+
+            # Possibly convert the units
+            if self.unit == 'K^2.sr':
+                self._Cl *= (
+                    self.Jy2K[str(self.freq1)] *
+                    self.Jy2K[str(self.freq2)]
+                    )
+
+            if self.unit == 'MJy^2/sr':
+                self._Cl /= 1.e12
+
+        return self._Cl
+
+    # Methods
+    ###########################################################################
+    def _freq2col(self, freqstr):
+        # 217x217, 353x353, 545x545, 857x857, 3000x3000
+        mapping = {
+            '217x217': 1,
+            '353x353': 2,
+            '545x545': 3,
+            '857x857': 4,
+            '3000x3000': 5,
         }
 
         return mapping[self.freqstr]

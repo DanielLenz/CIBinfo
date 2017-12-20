@@ -10,6 +10,7 @@ include cibinfo/resources/planck_2014_XXX/all_best_fit.txt
 include cibinfo/resources/lensing_HOD/*.txt
 include cibinfo/resources/cibxphi/*.txt
 include cibinfo/resources/cibxphi/*.dat
+include cibinfo/resources/cibxcib/*.dat
 include cibinfo/resources/phixphi/*.csv
 
 recursive-include cibinfo/ *.py
