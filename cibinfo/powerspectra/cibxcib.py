@@ -6,8 +6,12 @@ import os
 
 from .. import this_project as P
 
+__all__ = [
+    'Planck14Data',
+    'Planck14Model',
+    'Maniyar18Model', ]
 
-class AutoPowerspectrum():
+class CIBxCIB():
 
     _l = None  # multipole
     _Cl = None  # angular power
@@ -31,7 +35,7 @@ class AutoPowerspectrum():
             self.freq2 = freq2
 
     # Properties
-    ###########################################################################
+    ############
     @property
     def freqstr(self):
         self._freqstr = 'x'.join((
@@ -76,24 +80,21 @@ class AutoPowerspectrum():
         self._K2Jy = P.K2Jy
         return self._K2Jy
 
-    # methods
-    ###########################################################################
 
-
-class Planck2014(AutoPowerspectrum):
+class Planck14Data(CIBxCIB):
     def __init__(self, freq1, freq2=None, unit='Jy^2/sr'):
-        super(Planck2014, self).__init__(freq1, freq2=freq2, unit=unit)
+        super(Planck14Data, self).__init__(freq1, freq2=freq2, unit=unit)
 
         self.Cl_contains_SN = False
 
     # Properties
-    ###########################################################################
+    ############
     @property
     def raw_table(self):
         if self._raw_table is None:
             self._raw_table = np.loadtxt(os.path.join(
                 P.PACKAGE_DIR,
-                'resources/planck_2014_XXX/all_best_fit.txt'
+                'resources/cibxcib/Planck14_data.txt'
                 ))
         return self._raw_table
 
@@ -116,8 +117,8 @@ class Planck2014(AutoPowerspectrum):
     @property
     def S(self):
         """
-        Shot noise
-        Units are Jy^2/sr
+        Shot noise, units are Jy^2/sr. Taken from
+        Planck (2014 XXX)
         """
         if self._S is None:
             self._S = {
@@ -181,8 +182,8 @@ class Planck2014(AutoPowerspectrum):
 
         return self._dS[self.freqstr]
 
-    # methods
-    ###########################################################################
+    # Methods
+    #########
     def _freq2col(self, freqstr):
         mapping = {
             '857x857': 1,
@@ -216,72 +217,20 @@ class Planck2014(AutoPowerspectrum):
         return mapping[self.freqstr]
 
 
-class PaoloModel(AutoPowerspectrum):
+class Planck14Model(CIBxCIB):
     def __init__(self, freq1, freq2=None, unit='Jy^2/sr'):
-        super(PaoloModel, self).__init__(freq1, freq2=freq2, unit=unit)
+        super(Planck14Model, self).__init__(freq1, freq2=freq2, unit=unit)
 
         self.Cl_contains_SN = True
 
     # Properties
-    ###########################################################################
+    ############
     @property
     def raw_table(self):
         if self._raw_table is None:
             self._raw_table = np.loadtxt(os.path.join(
                 P.PACKAGE_DIR,
-                'resources/paolo_models/cib_all_spectra_l3000.txt'
-                ))
-        return self._raw_table
-
-    @property
-    def Cl(self):
-        if self._Cl is None:
-            # native unit is be Jy^2/sr
-            self._Cl = self.raw_table[:, self._freq2col(self.freqstr)].copy()
-
-            # Possibly convert the units
-            if self.unit == 'K^2.sr':
-                self._Cl *= (
-                    self.Jy2K[str(self.freq1)] *
-                    self.Jy2K[str(self.freq2)]
-                    )
-
-            if self.unit == 'MJy^2/sr':
-                self._Cl /= 1.e12
-
-        return self._Cl
-
-    # methods
-    ###########################################################################
-    def _freq2col(self, freqstr):
-        # l, 353x353, 353x545, 353x857, 545x545, 545x857, 857x857
-        mapping = {
-            '353x353': 1,
-            '545x353': 2,
-            '857x353': 3,
-            '545x545': 4,
-            '857x545': 5,
-            '857x857': 6,
-        }
-
-        return mapping[self.freqstr]
-
-
-class AbhiModel(AutoPowerspectrum):
-    def __init__(self, freq1, freq2=None, unit='Jy^2/sr'):
-        super(AbhiModel, self).__init__(freq1, freq2=freq2, unit=unit)
-
-        self.Cl_contains_SN = True
-        self.Cl_contains_1halo = True
-
-    # Properties
-    ###########################################################################
-    @property
-    def raw_table(self):
-        if self._raw_table is None:
-            self._raw_table = np.loadtxt(os.path.join(
-                P.PACKAGE_DIR,
-                'resources/cibxcib/abhimodel_cibxcib.dat'
+                'resources/cibxcib/Planck14_model.txt'
                 ))
         return self._raw_table
 
@@ -304,7 +253,59 @@ class AbhiModel(AutoPowerspectrum):
         return self._Cl
 
     # Methods
-    ###########################################################################
+    #########
+    def _freq2col(self, freqstr):
+        # l, 353x353, 353x545, 353x857, 545x545, 545x857, 857x857
+        mapping = {
+            '353x353': 1,
+            '545x353': 2,
+            '857x353': 3,
+            '545x545': 4,
+            '857x545': 5,
+            '857x857': 6,
+        }
+
+        return mapping[self.freqstr]
+
+
+class Maniyar18Model(CIBxCIB):
+    def __init__(self, freq1, freq2=None, unit='Jy^2/sr'):
+        super(Maniyar18Model, self).__init__(freq1, freq2=freq2, unit=unit)
+
+        self.Cl_contains_SN = True
+        self.Cl_contains_1halo = True
+
+    # Properties
+    ############
+    @property
+    def raw_table(self):
+        if self._raw_table is None:
+            self._raw_table = np.loadtxt(os.path.join(
+                P.PACKAGE_DIR,
+                'resources/cibxcib/Maniyar18_model.dat'
+                ))
+        return self._raw_table
+
+    @property
+    def Cl(self):
+        if self._Cl is None:
+            # native unit is Jy^2/sr
+            self._Cl = self.raw_table[:, self._freq2col(self.freqstr)].copy()
+
+            # Possibly convert the units
+            if self.unit == 'K^2.sr':
+                self._Cl *= (
+                    self.Jy2K[str(self.freq1)] *
+                    self.Jy2K[str(self.freq2)]
+                    )
+
+            if self.unit == 'MJy^2/sr':
+                self._Cl /= 1.e12
+
+        return self._Cl
+
+    # Methods
+    #########
     def _freq2col(self, freqstr):
         # 217x217, 353x353, 545x545, 857x857, 3000x3000
         mapping = {

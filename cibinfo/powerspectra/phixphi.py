@@ -8,8 +8,12 @@ import pandas as pd
 
 from .. import this_project as P
 
+__all__ = [
+    'Planck15Kappa',
+    'Planck15Phi', ]
 
-class AutoPowerspectrum():
+
+class PhixPhi():
 
     _l = None  # multipole
     _Cl = None  # angular power
@@ -19,8 +23,8 @@ class AutoPowerspectrum():
     def __init__(self):
         pass
 
-    # properties
-    ###########################################################################
+    # Properties
+    ############
     @property
     def l(self):
         if self._l is None:
@@ -32,7 +36,7 @@ class AutoPowerspectrum():
         return None
 
 
-class P15Kappa(AutoPowerspectrum):
+class Planck15Kappa(PhixPhi):
     """Contains information on the CMB lensing power spectrum from the Planck
     (2015) PR2 release (https://arxiv.org/abs/1502.01591). Data are taken from
     https://wiki.cosmos.esa.int/planckpla2015/index.php/Specially_processed_maps#2015_Lensing_map
@@ -45,16 +49,16 @@ class P15Kappa(AutoPowerspectrum):
     """
 
     def __init__(self):
-        super(P15Kappa, self).__init__()
+        super(Planck15Kappa, self).__init__()
 
-    # properties
-    ###########################################################################
+    # Properties
+    ############
     @property
     def df(self):
         if self._df is None:
             self._df = pd.read_csv(os.path.join(
                 P.PACKAGE_DIR,
-                'resources/phixphi/Cl_kappa_pr2.csv'),
+                'resources/phixphi/Planck15_kappa.csv'),
                 comment='#')
         return self._df
 
@@ -65,7 +69,7 @@ class P15Kappa(AutoPowerspectrum):
         return self._Cl
 
 
-class P15Phi(AutoPowerspectrum):
+class Planck15Phi(PhixPhi):
     """Contains information on the CMB lensing power spectrum from the Planck
     (2015) PR2 release (https://arxiv.org/abs/1502.01591). Data are taken from
     https://wiki.cosmos.esa.int/planckpla2015/index.php/Specially_processed_maps#2015_Lensing_map
@@ -80,16 +84,16 @@ class P15Phi(AutoPowerspectrum):
     _l4Cl = None
 
     def __init__(self):
-        super(P15Phi, self).__init__()
+        super(Planck15Phi, self).__init__()
 
-    # properties
-    ###########################################################################
+    # Properties
+    ############
     @property
     def df(self):
         if self._df is None:
             self._df = pd.read_csv(os.path.join(
                 P.PACKAGE_DIR,
-                'resources/phixphi/Cl_phi_pr2.csv'),
+                'resources/phixphi/Planck15_Phi.csv'),
                 comment='#')
         return self._df
 

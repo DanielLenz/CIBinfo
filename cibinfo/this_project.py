@@ -5,7 +5,8 @@ import os
 
 PACKAGE_DIR = os.path.dirname(os.path.abspath(__file__))
 
-# Taken from Planck (2014) XXX, Table 2
+# Conversion factors from K_CMB to Jy/sr for the Planck bands
+# Taken from Planck (2014 XXX), Table 2
 K2Jy = {
     '100': 244.1e6,
     '143': 371.74e6,

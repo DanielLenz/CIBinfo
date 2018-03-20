@@ -7,7 +7,13 @@ import os
 from .. import this_project as P
 
 
-class CrossPowerspectrum():
+__all__ = [
+    'Planck13Data',
+    'Planck13Model',
+    'Maniyar18Model', ]
+
+
+class CIBxPhi():
 
     _l = None  # multipole
 
@@ -26,7 +32,7 @@ class CrossPowerspectrum():
 
         self.freq = freq
 
-    # properties
+    # Properties
     ############
     @property
     def freqstr(self):
@@ -49,47 +55,19 @@ class CrossPowerspectrum():
         self._K2Jy = P.K2Jy
         return self._K2Jy
 
-#
-# class Planck2013(CrossPowerspectrum):
-#     def __init__(self, freq, unit='K*sr'):
-#         super(Planck2013, self).__init__(freq, unit=unit)
-#
-#     # properties
-#     ############
-#     @property
-#     def raw_table(self):
-#         if self._raw_table is None:
-#             self._raw_table = np.loadtxt(os.path.join(
-#                 P.PACKAGE_DIR,
-#                 'resources/lensing_HOD/lensing_{}.txt'.format(self.freq)
-#                 ))
-#         return self._raw_table
-#
-#     @property
-#     def Cl(self):
-#         if self._Cl is None:
-#             # native unit is muK*sr
-#             self._Cl = self.raw_table[:, 1].copy()
-#             self._Cl /= (self.l+1.)**3  # from l^3*Cl to Cl
-#             self._Cl /= 1.e6  # from muK*sr to K*sr
-#
-#             if self.unit == 'Jy':
-#                 self._Cl *= self.K2Jy[self.freqstr]
-#         return self._Cl
 
-
-class Planck2013(CrossPowerspectrum):
+class Planck13Data(CIBxPhi):
     def __init__(self, freq, unit='uK.sr'):
-        super(Planck2013, self).__init__(freq, unit=unit)
+        super(Planck13Data, self).__init__(freq, unit=unit)
 
-    # properties
-    ###########################################################################
+    # Properties
+    ############
     @property
     def raw_table(self):
         if self._raw_table is None:
             self._raw_table = np.genfromtxt(os.path.join(
                 P.PACKAGE_DIR,
-                'resources/cibxphi/Cl_{}_olivier.dat'.format(self.freq)),
+                'resources/cibxphi/Planck13_data_{}.dat'.format(self.freq)),
                 usecols=[0, 1, 2])
         return self._raw_table
 
@@ -133,18 +111,18 @@ class Planck2013(CrossPowerspectrum):
         return self._dCl
 
 
-class Model(CrossPowerspectrum):
+class Planck13Model(CIBxPhi):
     def __init__(self, freq, unit='Jy'):
-        super(Model, self).__init__(freq, unit=unit)
+        super(Planck13Model, self).__init__(freq, unit=unit)
 
-    # properties
-    ###########################################################################
+    # Properties
+    ############
     @property
     def raw_table(self):
         if self._raw_table is None:
             self._raw_table = np.genfromtxt(os.path.join(
                 P.PACKAGE_DIR,
-                'resources/cibxphi/cl_phixT_{}.txt'.format(self.freq)),
+                'resources/cibxphi/Planck13_model_{}.txt'.format(self.freq)),
                 usecols=[0, 1])
         return self._raw_table
 
@@ -168,19 +146,19 @@ class Model(CrossPowerspectrum):
         return self._Cl
 
 
-class AbhiModel(CrossPowerspectrum):
+class Maniyar18Model(CIBxPhi):
     def __init__(self, freq, unit='Jy'):
-        super(AbhiModel, self).__init__(freq, unit=unit)
+        super(Maniyar18Model, self).__init__(freq, unit=unit)
 
-    # properties
-    ###########################################################################
+    # Properties
+    ############
     @property
     def raw_table(self):
         if self._raw_table is None:
             self._raw_table = np.loadtxt(
                 os.path.join(
                     P.PACKAGE_DIR,
-                    'resources/cibxphi/abhimodel.dat'))
+                    'resources/cibxphi/Maniyar18_model.dat'))
         return self._raw_table
 
     @property
@@ -202,8 +180,8 @@ class AbhiModel(CrossPowerspectrum):
             self._Cl = self.l3Cl / self.l**3
         return self._Cl
 
-    # methods
-    ###########################################################################
+    # Methods
+    #########
     def _freq2col(self, freqstr):
         # ell, Phix100, Phix143, Phix217, Phix353, Phix545, Phix857
         mapping = {
