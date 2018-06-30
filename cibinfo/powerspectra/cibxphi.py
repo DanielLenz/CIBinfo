@@ -2,6 +2,7 @@ from __future__ import (absolute_import, division, print_function,
                         unicode_literals)
 
 import numpy as np
+import pandas as pd
 import os
 
 from .. import this_project as P
@@ -10,7 +11,8 @@ from .. import this_project as P
 __all__ = [
     'Planck13Data',
     'Planck13Model',
-    'Maniyar18Model', ]
+    'Maniyar18Model',
+    'GNILCxPlanckPR2', ]
 
 
 class CIBxPhi():
@@ -194,3 +196,73 @@ class Maniyar18Model(CIBxPhi):
         }
 
         return mapping[self.freqstr]
+
+
+class GNILCxPlanckPR2(CIBxPhi):
+    def __init__(self, freq, unit='Jy'):
+        super().__init__(freq, unit=unit)
+
+    # Properties
+    ############
+    @property
+    def raw_table(self):
+        if self._raw_table is None:
+            self._raw_table = pd.read_csv(
+                os.path.join(
+                    P.PACKAGE_DIR,
+                    f'resources/cibxphi/df_gnilcxphi_binned_{self.freq}.csv'),
+                comment='#')
+
+        return self._raw_table
+
+    @property
+    def l(self):
+        if self._l is None:
+            self._l = self.raw_table['b'].values
+        return self._l
+
+    @property
+    def dl(self):
+        if self._dl is None:
+            self._dl = self.raw_table['db'].values
+        return self._dl
+
+    @property
+    def Cl(self):
+        if self._Cl is None:
+            self._Cl = self.l3Cl / self.l**3
+
+        return self._Cl
+
+    @property
+    def dCl(self):
+        if self._dCl is None:
+            self._dCl = self.l3dCl / self.l**3
+        return self._dCl
+
+    @property
+    def l3Cl(self):
+        if self._l3Cl is None:
+
+            # Native unit is Jy
+            self._l3Cl = self.raw_table['b3Cb'].values
+
+            if self.unit == 'uK.sr':
+                self._l3Cl *= self.Jy2K[self.freqstr] * 1.e6
+            if self.unit == 'MJy':
+                self._l3Cl /= 1.e6
+
+        return self._l3Cl
+
+    @property
+    def dl3Cl(self):
+        if self._dl3Cl is None:
+            # Native unit is Jy
+            self._dl3Cl = self.raw_table['b3dCb'].values
+
+            if self.unit == 'uK.sr':
+                self._dl3Cl *= self.Jy2K[self.freqstr] * 1.e6
+            if self.unit == 'MJy':
+                self._dl3Cl /= 1.e6
+
+        return self._dl3Cl

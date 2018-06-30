@@ -81,6 +81,7 @@ class Planck15Phi(PhixPhi):
     $$ C_{\ell}^{\kappa\kappa} = [0.5(\ell(\ell+1))]^2 C_{\ell}^{\phi\phi} $$
     """
 
+    _Cl = None
     _l4Cl = None
 
     def __init__(self):

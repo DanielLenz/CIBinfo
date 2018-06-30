@@ -11,6 +11,7 @@ __all__ = [
     'Planck14Model',
     'Maniyar18Model', ]
 
+
 class CIBxCIB():
 
     _l = None  # multipole
@@ -85,7 +86,7 @@ class Planck14Data(CIBxCIB):
     def __init__(self, freq1, freq2=None, unit='Jy^2/sr'):
         super(Planck14Data, self).__init__(freq1, freq2=freq2, unit=unit)
 
-        self.Cl_contains_SN = False
+        self.Cl_contains_SN = True
 
     # Properties
     ############
@@ -101,8 +102,11 @@ class Planck14Data(CIBxCIB):
     @property
     def Cl(self):
         if self._Cl is None:
-            # native unit is Jy^2/sr
+            # Native unit is Jy^2/sr
             self._Cl = self.raw_table[:, self._freq2col(self.freqstr)].copy()
+
+            # We add the shot noise, which is also in Jy^2/sr
+            self._Cl += self.S
 
             if self.unit == 'K^2*sr':
                 self._Cl *= (
