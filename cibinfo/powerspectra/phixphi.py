@@ -17,6 +17,7 @@ class PhixPhi():
 
     _l = None  # multipole
     _Cl = None  # angular power
+    _Nl = None  # noise power spectrum
 
     _df = None  # raw table, taken from publications, emails, etc
 
@@ -67,6 +68,12 @@ class Planck15Kappa(PhixPhi):
         if self._Cl is None:
             self._Cl = self.df['Cl'].values.copy()
         return self._Cl
+
+    @property
+    def Nl(self):
+        if self._Nl is None:
+            self._Nl = self.df['Nl'].values.copy()
+        return self._Nl
 
 
 class Planck15Phi(PhixPhi):

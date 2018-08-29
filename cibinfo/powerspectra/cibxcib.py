@@ -25,8 +25,10 @@ class CIBxCIB():
     _raw_table = None  # raw table, taken from publications, emails, etc
 
     def __init__(self, freq1, freq2=None, unit='Jy^2/sr'):
-        if unit not in ['Jy^2/sr', 'MJy^2/sr', 'K^2.sr']:
-            raise ValueError('Unit must be either "Jy^2/sr" or "K^2.sr"')
+        if unit not in ['Jy^2/sr', 'MJy^2/sr', 'K^2.sr', 'uK^2.sr']:
+            raise ValueError(
+                'Unit must be either "Jy^2/sr", '
+                '"MJy^2/sr", "uK^2.sr" or "K^2.sr"')
         self.unit = unit
 
         self.freq1 = freq1
@@ -108,10 +110,13 @@ class Planck14Data(CIBxCIB):
             # We add the shot noise, which is also in Jy^2/sr
             self._Cl += self.S
 
-            if self.unit == 'K^2*sr':
+            if self.unit in ['K^2.sr', 'uK^2.sr']:
                 self._Cl *= (
                     self.Jy2K[str(self.freq1)] *
                     self.Jy2K[str(self.freq2)])
+
+                if self.unit == 'uK^2.sr':
+                    self._Cl *= 1.e12
 
             if self.unit == 'MJy^2/sr':
                 self._Cl /= 1.e12
@@ -143,10 +148,13 @@ class Planck14Data(CIBxCIB):
                 '3000x217': 95,
             }
 
-            if self.unit == 'K^2*sr':
+            if self.unit in ['K^2.sr', 'uK^2.sr']:
                 self._S *= (
                     self.Jy2K[str(self.freq1)] *
                     self.Jy2K[str(self.freq2)])
+
+                if self.unit == 'uK^2.sr':
+                    self._S *= 1.e12
 
             if self.unit == 'MJy^2/sr':
                 self._S /= 1.e12
@@ -176,10 +184,12 @@ class Planck14Data(CIBxCIB):
                 '3000x353': 48,
                 '3000x217': 11,
             }
-            if self.unit == 'K^2*sr':
+            if self.unit in ['K^2.sr', 'uK^2.sr']:
                 self._dS *= (
                     self.Jy2K[str(self.freq1)] *
                     self.Jy2K[str(self.freq2)])
+                if self.unit == 'uK^2.sr':
+                    self._dS *= 1.e12
 
             if self.unit == 'MJy^2/sr':
                 self._dS /= 1.e12
@@ -245,11 +255,13 @@ class Planck14Model(CIBxCIB):
             self._Cl = self.raw_table[:, self._freq2col(self.freqstr)].copy()
 
             # Possibly convert the units
-            if self.unit == 'K^2.sr':
+            if self.unit in ['K^2.sr', 'uK^2.sr']:
                 self._Cl *= (
                     self.Jy2K[str(self.freq1)] *
                     self.Jy2K[str(self.freq2)]
                     )
+                if self.unit == ['uK^2.sr']:
+                    self._Cl *= 1.e12
 
             if self.unit == 'MJy^2/sr':
                 self._Cl /= 1.e12
@@ -297,11 +309,12 @@ class Maniyar18Model(CIBxCIB):
             self._Cl = self.raw_table[:, self._freq2col(self.freqstr)].copy()
 
             # Possibly convert the units
-            if self.unit == 'K^2.sr':
+            if self.unit in ['K^2.sr', 'uK^2.sr']:
                 self._Cl *= (
                     self.Jy2K[str(self.freq1)] *
-                    self.Jy2K[str(self.freq2)]
-                    )
+                    self.Jy2K[str(self.freq2)])
+                if self.unit == ['uK^2.sr']:
+                    self._Cl *= 1.e12
 
             if self.unit == 'MJy^2/sr':
                 self._Cl /= 1.e12

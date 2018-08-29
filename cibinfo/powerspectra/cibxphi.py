@@ -210,7 +210,7 @@ class GNILCxPlanckPR2(CIBxPhi):
             self._raw_table = pd.read_csv(
                 os.path.join(
                     P.PACKAGE_DIR,
-                    f'resources/cibxphi/df_gnilcxphi_binned_{self.freq}.csv'),
+                    f'resources/cibxphi/gnilcxPhi_binned.csv'),
                 comment='#')
 
         return self._raw_table
@@ -218,14 +218,14 @@ class GNILCxPlanckPR2(CIBxPhi):
     @property
     def l(self):
         if self._l is None:
-            self._l = self.raw_table['b'].values
+            self._l = self.raw_table['ell'].values
         return self._l
 
-    @property
-    def dl(self):
-        if self._dl is None:
-            self._dl = self.raw_table['db'].values
-        return self._dl
+    # @property
+    # def dl(self):
+    #     if self._dl is None:
+    #         self._dl = self.raw_table['db'].values
+    #     return self._dl
 
     @property
     def Cl(self):
@@ -245,7 +245,7 @@ class GNILCxPlanckPR2(CIBxPhi):
         if self._l3Cl is None:
 
             # Native unit is Jy
-            self._l3Cl = self.raw_table['b3Cb'].values
+            self._l3Cl = self.raw_table[f'l3Cl_{self.freq}'].values
 
             if self.unit == 'uK.sr':
                 self._l3Cl *= self.Jy2K[self.freqstr] * 1.e6
@@ -258,7 +258,7 @@ class GNILCxPlanckPR2(CIBxPhi):
     def dl3Cl(self):
         if self._dl3Cl is None:
             # Native unit is Jy
-            self._dl3Cl = self.raw_table['b3dCb'].values
+            self._dl3Cl = self.raw_table[f'dl3Cl_{self.freq}'].values
 
             if self.unit == 'uK.sr':
                 self._dl3Cl *= self.Jy2K[self.freqstr] * 1.e6

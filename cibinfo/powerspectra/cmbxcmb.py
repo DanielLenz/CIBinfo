@@ -25,12 +25,13 @@ class CMBxCMB():
     _raw_table = None  # raw table, taken from publications, emails, etc
 
     def __init__(self, freq=None, mode='TT', unit='uK^2.sr'):
-        if unit not in ['Jy^2/sr', 'MJy^2/sr', 'uK^2.sr']:
+        if unit not in ['Jy^2/sr', 'MJy^2/sr', 'uK^2.sr', 'K^2.sr']:
             raise ValueError(
-                'Unit must be either "Jy^2/sr", "MJy^2/sr", or "uK^2.sr"')
+                'Unit must be either "Jy^2/sr",'
+                '"MJy^2/sr", "K^2.sr", or "uK^2.sr"')
         self.unit = unit
 
-        if (unit != 'uK^2.sr') and (freq is None):
+        if (unit not in ['uK^2.sr', 'K^2.sr']) and (freq is None):
             raise ValueError(
                 'If unit is frequency-dependent, freq must be provided.')
 
@@ -102,6 +103,9 @@ class Planck15Model(CMBxCMB):
         if self._l2Cl is None:
             # Native unit is uK^2/sr
             self._l2Cl = self.raw_table[self.mode].values
+
+            if self.unit == 'K^2.sr':
+                self._l2Cl /= 1.e12
 
             if self.unit in ['MJy^2/sr', 'Jy^2/sr']:
                 self._l2Cl /= 1.e12  # from uK^2.sr to K^2.sr
