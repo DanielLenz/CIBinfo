@@ -1,8 +1,11 @@
+import unittest
+
 import numpy as np
 
 from cibinfo.powerspectra import cibxcib as TT
 from cibinfo.powerspectra import cibxphi as TP
 from cibinfo.powerspectra import phixphi as PP
+from cibinfo.powerspectra import noise
 from cibinfo import this_project as P
 
 
@@ -120,3 +123,6 @@ class TestPhixPhi():
         np.testing.assert_almost_equal(
             p15_phi.Cl[2],
             1.2838e-08)
+
+class TestNoise(unittest.TestCase):
+    ...
