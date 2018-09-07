@@ -31,19 +31,30 @@ class CIBxCIB():
                 '"MJy^2/sr", "uK^2.sr" or "K^2.sr"')
         self.unit = unit
 
-        self.freq1 = freq1
+        self.freq1 = self.freq2int(freq1)
         if freq2 is None:
             self.freq2 = freq1
         else:
-            self.freq2 = freq2
+            self.freq2 = self.freq2int(freq2)
+
+    # Methods
+    #########
+    def freq2int(self, freq):
+        if isinstance(freq, str):
+            return int(freq)
+        else:
+            if isinstance(freq, int):
+                return freq
+            else:
+                raise TypeError('freq must be int or str')
 
     # Properties
     ############
     @property
     def freqstr(self):
         self._freqstr = 'x'.join((
-            str(max([self.freq1, self.freq2])),
-            str(min([self.freq1, self.freq2]))
+            str(max([int(self.freq1), int(self.freq2)])),
+            str(min([int(self.freq1), int(self.freq2)]))
             ))
         return self._freqstr
 

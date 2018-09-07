@@ -29,6 +29,7 @@ setup(
         'cibinfo',
         'cibinfo.utils',
         'cibinfo.powerspectra',
+        'cibinfo.instruments',
     ],
     package_dir={'cibinfo':
                  'cibinfo'},

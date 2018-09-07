@@ -10,6 +10,7 @@ from .. import this_project as P
 
 __all__ = [
     'PlanckPR2',
+    'PlanckPR3',
 ]
 
 class DifferenceSpectrum:
@@ -31,43 +32,9 @@ class DifferenceSpectrum:
 
     @property
     def ell(self):
-        raise NotImplementedError('Only in inherited class')
-
-    @property
-    def Nl(self, ):
-        raise NotImplementedError('Only in inherited class')
-
-
-class PlanckPR2(DifferenceSpectrum):
-    """ Angular power spectra for the Planck PR2 half-difference maps.
-    """
-    def __init__(self, freq, split_type='ring', unit='Jy^2/sr'):
-        super().__init__(
-            freq=freq,
-            split_type=split_type,
-            unit=unit)
-
-    @property
-    def ell(self):
         if self._ell is None:
             self._ell = self.raw_table['ell'].values
         return self._ell
-
-    @property
-    def Nl(self, ):
-        if self._Nl is None:
-            # The native unit is Jy^2/sr
-            self._Nl = self.raw_table[self.freq].values
-
-            if self.unit == 'MJy^2/sr':
-                self._Nl /= 1.e12
-            if self.unit == 'K^2.sr':
-                self._Nl *= (P.Jy2K[self.freq])**2
-            if self.unit == 'uK^2.sr':
-                self._Nl *= (P.Jy2K[self.freq])**2
-                self._Nl *= 1.e12  # from K^2.sr to uK^2.sr
-
-        return self._Nl
 
     @property
     def unit(self):
@@ -123,6 +90,44 @@ class PlanckPR2(DifferenceSpectrum):
         self._split_type = value
 
     @property
+    def Nl(self, ):
+        raise NotImplementedError('Only in inherited class')
+
+    @property
+    def raw_table(self):
+        raise NotImplementedError('Only in inherited class')
+
+    @raw_table.setter
+    def raw_table(self, value):
+        raise RuntimeError('raw_table cannot be changed')
+
+
+class PlanckPR2(DifferenceSpectrum):
+    """ Angular power spectra for the Planck PR2 half-difference maps.
+    """
+    def __init__(self, freq, split_type='ring', unit='Jy^2/sr'):
+        super().__init__(
+            freq=freq,
+            split_type=split_type,
+            unit=unit)
+
+    @property
+    def Nl(self, ):
+        if self._Nl is None:
+            # The native unit is Jy^2/sr
+            self._Nl = self.raw_table[self.freq].values
+
+            if self.unit == 'MJy^2/sr':
+                self._Nl /= 1.e12
+            if self.unit == 'K^2.sr':
+                self._Nl *= (P.Jy2K[self.freq])**2
+            if self.unit == 'uK^2.sr':
+                self._Nl *= (P.Jy2K[self.freq])**2
+                self._Nl *= 1.e12  # from K^2.sr to uK^2.sr
+
+        return self._Nl
+
+    @property
     def raw_table(self):
         if self._raw_table is None:
             self._raw_table = pd.read_csv(
@@ -132,10 +137,62 @@ class PlanckPR2(DifferenceSpectrum):
                     comment='#')
 
         return self._raw_table
-    
-    @raw_table.setter
-    def raw_table(self, value):
-        raise RuntimeError('raw_table cannot be changed')
+
+
+class PlanckPR3(DifferenceSpectrum):
+    """ Angular power spectra for the Planck PR3 half-difference maps.
+    """
+    def __init__(self, freq, split_type='ring', unit='Jy^2/sr'):
+        super().__init__(
+            freq=freq,
+            split_type=split_type,
+            unit=unit)
+
+    @property
+    def Nl(self, ):
+        if self._Nl is None:
+            # The native unit is Jy^2/sr
+            self._Nl = self.raw_table[self.freq].values
+
+            if self.unit == 'MJy^2/sr':
+                self._Nl /= 1.e12
+            if self.unit == 'K^2.sr':
+                self._Nl *= (P.Jy2K[self.freq])**2
+            if self.unit == 'uK^2.sr':
+                self._Nl *= (P.Jy2K[self.freq])**2
+                self._Nl *= 1.e12  # from K^2.sr to uK^2.sr
+
+        return self._Nl
+
+    @property
+    def raw_table(self):
+        if self._raw_table is None:
+            self._raw_table = pd.read_csv(
+                    os.path.join(
+                        P.PACKAGE_DIR,
+                        'resources/noise/PlanckPR3_ring_differences.csv'),
+                    comment='#')
+
+        return self._raw_table
+
+    @property
+    def freq(self):
+        return self._freq
+
+    @freq.setter
+    def freq(self, value):
+        if not (isinstance(value, str) or isinstance(value, int)):
+            raise TypeError('freq must be str or int')
+
+        value = str(value)
+
+        # TODO go back and also add the 100 and 143 GHz data
+        allowed = {'217', '353', '545', '857'}
+
+        if value not in allowed:
+            raise ValueError(f'freq must be in {allowed}')
+
+        self._freq = value
 
 
 def main():
