@@ -27,7 +27,6 @@ setup(
     url='https://github.com/DanielLenz/cibinfo',
     packages=[
         'cibinfo',
-        'cibinfo.utils',
         'cibinfo.powerspectra',
         'cibinfo.instruments',
     ],
