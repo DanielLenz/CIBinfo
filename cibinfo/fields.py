@@ -360,16 +360,22 @@ class CIBxKappa(CorrField):
     @property
     def Nl_XX(self):
         if self._Nl_XX is None:
-            self._Nl_XX = self.sim_cl.noise_tt.copy()
+            if self.add_noise1:
+                self._Nl_XX = self.sim_cl.noise_tt[:self.lmax]
+            else:
+                self._Nl_XX = np.zeros(self.lmax)
         
-        return self._Nl_XX[:self.lmax]
+        return self._Nl_XX
 
     @property
     def Nl_YY(self):
         if self._Nl_YY is None:
-            self._Nl_YY = self.sim_cl.noise_kk.copy()
+            if self.add_noise2:
+                self._Nl_YY = self.sim_cl.noise_kk[:self.lmax]
+            else:
+                self._Nl_YY = np.zeros(self.lmax)
         
-        return self._Nl_YY[:self.lmax]
+        return self._Nl_YY
 
 
 def main():
