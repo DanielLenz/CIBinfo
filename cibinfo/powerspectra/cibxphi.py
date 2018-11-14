@@ -237,7 +237,7 @@ class GNILCxPlanckPR2(CIBxPhi):
     @property
     def dCl(self):
         if self._dCl is None:
-            self._dCl = self.l3dCl / self.l**3
+            self._dCl = self.dl3Cl / self.l**3
         return self._dCl
 
     @property

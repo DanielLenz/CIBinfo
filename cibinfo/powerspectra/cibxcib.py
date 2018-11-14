@@ -4,6 +4,8 @@ from __future__ import (absolute_import, division, print_function,
 import numpy as np
 import os
 
+from astropy.io import fits
+
 from .. import this_project as P
 
 __all__ = [
@@ -307,17 +309,25 @@ class Maniyar18Model(CIBxCIB):
     @property
     def raw_table(self):
         if self._raw_table is None:
-            self._raw_table = np.loadtxt(os.path.join(
+            self._raw_table = fits.open(os.path.join(
                 P.PACKAGE_DIR,
-                'resources/cibxcib/Maniyar18_model.dat'
+                'resources/cibxcib/Maniyar18_model_crosspowers.dat'
                 ))
         return self._raw_table
+
+    @property
+    def l(self):
+        if self._l is None:
+            self._l = self.raw_table[1].data
+        return self._l
 
     @property
     def Cl(self):
         if self._Cl is None:
             # native unit is Jy^2/sr
-            self._Cl = self.raw_table[:, self._freq2col(self.freqstr)].copy()
+            self._Cl = self.raw_table[0].data[
+                self._freq2col(str(self.freq1)),
+                self._freq2col(str(self.freq2))]
 
             # Possibly convert the units
             if self.unit in ['K^2.sr', 'uK^2.sr']:
@@ -334,14 +344,16 @@ class Maniyar18Model(CIBxCIB):
 
     # Methods
     #########
-    def _freq2col(self, freqstr):
+    def _freq2col(self, freq):
         # 217x217, 353x353, 545x545, 857x857, 3000x3000
         mapping = {
-            '217x217': 1,
-            '353x353': 2,
-            '545x545': 3,
-            '857x857': 4,
-            '3000x3000': 5,
+            '100': 0,
+            '143': 1,
+            '217': 2,
+            '353': 3,
+            '545': 4,
+            '857': 5,
+            '3000': 6,
         }
 
-        return mapping[self.freqstr]
+        return mapping[freq]

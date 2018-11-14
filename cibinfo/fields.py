@@ -79,7 +79,7 @@ class SimCl:
     @property
     def tk(self):
         if self._tk is None:
-            self._tk = TK.Planck13Model(
+            self._tk = TK.Maniyar18Model(
                 self.freq,
                 unit=unit_converter[self.unit]).Cl
             
@@ -113,107 +113,8 @@ class Field:
 
     _lmax = None
 
-    def __init__(self, nside=1024, pixwin=False, fwhm=0.0, lmax=None):
+    def __init__(self, nside=1024, lmax=None):
         self.nside = nside
-        self.pixwin = pixwin
-        self.fwhm = fwhm
-        self.lmax = lmax
-
-    @property
-    def lmax(self):
-        return self._lmax
-
-    @lmax.setter
-    def lmax(self, value):
-        if value is None:
-            # ell=1998 is the upper limit for the simulated Cls
-            # We use either that, or the typical 3*nside to simulate the
-            # maps
-            self._lmax = min(1998, 3 * self.nside)
-        elif not isinstance(value, int):
-            raise TypeError('lmax must be int or None.')
-        else:
-            self._lmax = value
-
-
-class CIB(Field):
-    """Generates random realizations of CIB fields, based on the
-    Maniyar+ (2018) model."""
-
-    _cib_alm = None
-    _cib_map = None
-
-    def __init__(
-            self, freq, unit='MJy^2/sr', nside=1024, pixwin=False, fwhm=0.0,
-            add_noise=False, lmax=None):
-
-        super().__init__(nside=nside, pixwin=pixwin, fwhm=fwhm, lmax=lmax)
-
-        self.freq = freq
-        self.unit = unit
-        self.add_noise = add_noise
-
-        # Create Cls
-        sim_cl = SimCl(freq=freq, unit=unit)
-
-        self.Cl = sim_cl.tt
-        if self.add_noise:
-            self.Nl = sim_cl.noise_tt
-
-    @property
-    def Cl_tot(self):
-        if self.add_noise:
-            self._Cl_tot = self.Cl + self.Nl
-        else:
-            self._Cl_tot = self.Cl.copy()
-
-        return self._Cl_tot[:self.lmax]
-
-    def generate(self):
-        """Generates a random realization of the CIB by updating the alm
-        and hpx_map properties."""
-
-        self._cib_alm = hp.synalm(self.Cl_tot, verbose=False, lmax=self.lmax)
-        self._cib_map = hp.alm2map(
-            self.cib_alm,
-            nside=self.nside,
-            pixwin=self.pixwin,
-            fwhm=np.radians(self.fwhm),
-            pol=False)
-
-        return self.cib_map
-
-    @property
-    def cib_alm(self):
-        return self._cib_alm
-    
-    @property
-    def cib_map(self):
-        return self._cib_map
-
-class CorrField:
-
-    _lmax = None
-    _Cl_XX = None
-    _Cl_YY = None
-    _Nl_XX = None
-    _Nl_YY = None
-    _Cl_XY = None
-
-    def __init__(
-        self, freq, unit='MJy^2/sr', nside=1024,
-            pixwin1=False, fwhm1=0.0, add_noise1=False,
-            pixwin2=False, fwhm2=0.0, add_noise2=False,
-            lmax=None):
-
-        self.nside = nside
-        self.unit=unit
-        self.pixwin1 = pixwin1
-        self.pixwin2 = pixwin2
-        self.fwhm1 = fwhm1
-        self.fwhm2 = fwhm2
-        self.add_noise1 = add_noise1
-        self.add_noise2 = add_noise2
         self.lmax = lmax
 
     @property
@@ -235,6 +136,120 @@ class CorrField:
             raise TypeError('lmax must be int or None.')
         else:
             self._lmax = value
+
+    @property
+    def Cl(self):
+        raise NotImplementedError()
+
+    @property
+    def alm(self):
+        raise NotImplementedError()
+
+
+# class CIB(Field):
+#     """Generates random realizations of CIB fields, based on the
+#     Maniyar+ (2018) model."""
+
+
+#     def __init__(
+#             self, freq, unit='MJy^2/sr', nside=1024, pixwin=False, fwhm=0.0,
+#             add_noise=False, lmax=None):
+
+#         super().__init__(nside=nside, lmax=lmax)
+
+#         self.freq = freq
+#         self.unit = unit
+#         self.add_noise = add_noise
+
+#         # Create Cls
+#         self.sim_cl = SimCl(freq=freq, unit=unit)
+
+#     def generate(self):
+#         self.generate_signal()
+#         self.generate_noise()
+
+#         return self.hpxmap_X, self.hpxmap_Y
+
+#     def generate_signal(self):
+#         self.alm_X = hp.synalm(self.Cl_XX, new=True)
+
+#     def generate_noise(self):
+#         if self.add_noise:
+#             self.noisemap_X = hp.synfast(
+#                 self.Nl, nside=self.nside,
+#                 pol=False)
+#         else:
+#             self.noisemap_X = np.zeros(self.npix)
+
+#         if self.add_noise2:
+#             self.noisemap_Y = hp.synfast(
+#                 self.Nl_YY, nside=self.nside,
+#                 pol=False)
+#         else:
+#             self.noisemap_Y = np.zeros(self.npix)
+
+#     @property
+#     def hpxmap_X(self):
+#         self._hpxmap_X = self.noisemap_X + self.signalmap_X
+
+#         return self._hpxmap_X
+
+#     @property
+#     def Cl_tot(self):
+#         if self.add_noise:
+#             self._Cl_tot = self.Cl + self.Nl
+#         else:
+#             self._Cl_tot = self.Cl.copy()
+
+#         return self._Cl_tot[:self.lmax]
+
+#     def generate(self):
+#         """Generates a random realization of the CIB by updating the alm
+#         and hpx_map properties."""
+
+#         self._cib_alm = hp.synalm(self.Cl_tot, verbose=False, lmax=self.lmax)
+#         self._cib_map = hp.alm2map(
+#             self.cib_alm,
+#             nside=self.nside,
+#             pixwin=self.pixwin,
+#             fwhm=np.radians(self.fwhm),
+#             pol=False)
+
+#         return self.cib_map
+
+#     @property
+#     def cib_alm(self):
+#         return self._cib_alm
+    
+#     @property
+#     def cib_map(self):
+#         return self._cib_map
+
+
+class CorrField(Field):
+
+    _lmax = None
+    _Cl_XX = None
+    _Cl_YY = None
+    _Nl_XX = None
+    _Nl_YY = None
+    _Cl_XY = None
+
+    def __init__(
+        self, freq, unit='MJy^2/sr', nside=1024,
+            pixwin1=False, fwhm1=0.0, add_noise1=False,
+            pixwin2=False, fwhm2=0.0, add_noise2=False,
+            lmax=None):
+
+        super().__init__(nside=nside, lmax=lmax)
+
+        self.unit = unit
+        self.pixwin1 = pixwin1
+        self.pixwin2 = pixwin2
+        self.fwhm1 = fwhm1
+        self.fwhm2 = fwhm2
+        self.add_noise1 = add_noise1
+        self.add_noise2 = add_noise2
 
     @property
     def Cl_XX(self):
@@ -274,13 +289,15 @@ class CorrField:
     def generate_noise(self):
         if self.add_noise1:
             self.noisemap_X = hp.synfast(
-                self.Nl_XX, nside=self.nside)
+                self.Nl_XX, nside=self.nside,
+                pol=False, verbose=False,)
         else:
             self.noisemap_X = np.zeros(self.npix)
 
         if self.add_noise2:
             self.noisemap_Y = hp.synfast(
-                self.Nl_YY, nside=self.nside)
+                self.Nl_YY, nside=self.nside,
+                pol=False, verbose=False,)
         else:
             self.noisemap_Y = np.zeros(self.npix)
 
@@ -301,7 +318,7 @@ class CorrField:
         self._signalmap_X = hp.alm2map(
             self.alm_X, pixwin=self.pixwin1,
             fwhm=np.radians(self.fwhm1),
-            nside=self.nside, pol=False)
+            nside=self.nside, pol=False, verbose=False)
 
         return self._signalmap_X
 
@@ -310,11 +327,96 @@ class CorrField:
         self._signalmap_Y = hp.alm2map(
             self.alm_Y, pixwin=self.pixwin2,
             fwhm=np.radians(self.fwhm2),
-            nside=self.nside, pol=False)
+            nside=self.nside, pol=False, verbose=False)
 
         return self._signalmap_Y
 
-    
+
+class CIBxCIB(CorrField):
+    _alm = None
+    _signalmap = None
+
+    """Generates two CIB fields with identical signal, but different noise
+    properties."""
+    def __init__(
+        self, freq, unit='MJy^2/sr', nside=1024, pixwin=True,
+        fwhm=0.0, add_noise=True, lmax=None):
+
+        super().__init__(
+            freq=freq, unit=unit, nside=nside,
+            pixwin1=pixwin, fwhm1=fwhm,
+            pixwin2=pixwin, fwhm2=fwhm,
+            add_noise1=add_noise, add_noise2=add_noise,
+            lmax=lmax
+        )
+
+        self.sim_cl = SimCl(freq=freq, unit=unit) 
+
+    @property
+    def Cl_XX(self):
+        if self._Cl_XX is None:
+            self._Cl_XX = self.sim_cl.tt.copy()
+
+        return self._Cl_XX[:self.lmax]
+
+    @property
+    def Nl_XX(self):
+        if self._Nl_XX is None:
+            if self.add_noise1:
+                self._Nl_XX = self.sim_cl.noise_tt[:self.lmax]
+            else:
+                self._Nl_XX = np.zeros(self.lmax)
+        
+        return self._Nl_XX
+
+    @property
+    def alm(self):
+        return self._alm
+
+    @alm.setter
+    def alm(self, val):
+        self._alm = val
+
+    def generate_signal(self):
+        self.alm = hp.synalm(self.Cl_XX,)
+
+    def generate_noise(self):
+        if self.add_noise1:
+            self.noisemap_X = hp.synfast(
+                self.Nl_XX, nside=self.nside,
+                pol=False)
+        else:
+            self.noisemap_X = np.zeros(self.npix)
+
+        if self.add_noise2:
+            self.noisemap_Y = hp.synfast(
+                self.Nl_XX, nside=self.nside,
+                pol=False)
+        else:
+            self.noisemap_Y = np.zeros(self.npix)
+
+    @property
+    def hpxmap_X(self):
+        self._hpxmap_X = self.noisemap_X + self.signalmap
+
+        return self._hpxmap_X
+
+    @property
+    def hpxmap_Y(self):
+        self._hpxmap_Y = self.noisemap_Y + self.signalmap
+
+        return self._hpxmap_Y
+
+    @property
+    def signalmap(self):
+        self._signalmap = hp.alm2map(
+            self.alm, pixwin=self.pixwin1,
+            fwhm=np.radians(self.fwhm1),
+            nside=self.nside, pol=False)
+
+        return self._signalmap
+
+
 class CIBxKappa(CorrField):
     """Generates correlated fields of CIB and lensing convergence kappa."""
 
