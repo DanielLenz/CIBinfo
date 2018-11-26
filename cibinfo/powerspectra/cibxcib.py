@@ -407,3 +407,22 @@ class Planck14Data(CIBxCIB):
                 self._Cl /= 1.e12
 
         return self._Cl
+
+    @property
+    def dCl(self):
+        if self._dCl is None:
+            # Native unit is Jy^2/sr
+            self._dCl = self.raw_table[f'd{self.freq1}x{self.freq2}']
+
+            if self.unit in ['K^2.sr', 'uK^2.sr']:
+                self._dCl *= (
+                    self.Jy2K[str(self.freq1)] *
+                    self.Jy2K[str(self.freq2)])
+
+                if self.unit == 'uK^2.sr':
+                    self._dCl *= 1.e12
+
+            if self.unit == 'MJy^2/sr':
+                self._dCl /= 1.e12
+
+        return self._dCl
