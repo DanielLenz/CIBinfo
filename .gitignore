@@ -62,3 +62,6 @@ target/
 # pyenv python configuration file
 .python-version
 notebooks/.ipynb_checkpoints
+
+# VS code
+.vscode/

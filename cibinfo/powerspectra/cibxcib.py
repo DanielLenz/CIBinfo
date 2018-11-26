@@ -5,11 +5,13 @@ import numpy as np
 import os
 
 from astropy.io import fits
+from astropy.table import Table
 
 from .. import this_project as P
 
 __all__ = [
     'Planck14Data',
+    'Planck14DataAlt',
     'Planck14Model',
     'Maniyar18Model', ]
 
@@ -97,7 +99,7 @@ class CIBxCIB():
         return self._K2Jy
 
 
-class Planck14Data(CIBxCIB):
+class Planck14DataAlt(CIBxCIB):
     def __init__(self, freq1, freq2=None, unit='Jy^2/sr'):
         super(Planck14Data, self).__init__(freq1, freq2=freq2, unit=unit)
 
@@ -357,3 +359,51 @@ class Maniyar18Model(CIBxCIB):
         }
 
         return mapping[freq]
+
+class Planck14Data(CIBxCIB):
+    def __init__(self, freq1, freq2=None, unit='Jy^2/sr'):
+        super(Planck14Data, self).__init__(freq1, freq2=freq2, unit=unit)
+
+        self.Cl_contains_SN = True
+
+    # Properties
+    ############
+    @property
+    def raw_table(self):
+        if self._raw_table is None:
+            self._raw_table = Table.read(os.path.join(
+                P.PACKAGE_DIR,
+                'resources/cibxcib/Planck14_data_frompaper.txt'
+                ),
+                format='csv',
+                delimiter=';')
+        return self._raw_table
+
+    @property
+    def l(self):
+        if self._l is None:
+            self._l = self.raw_table['ell']
+
+        return self._l
+
+    @property
+    def Cl(self):
+        if self._Cl is None:
+            # Native unit is Jy^2/sr
+            self._Cl = self.raw_table[f'{self.freq1}x{self.freq2}']
+
+            # We add the shot noise, which is also in Jy^2/sr
+            # self._Cl += self.S
+
+            if self.unit in ['K^2.sr', 'uK^2.sr']:
+                self._Cl *= (
+                    self.Jy2K[str(self.freq1)] *
+                    self.Jy2K[str(self.freq2)])
+
+                if self.unit == 'uK^2.sr':
+                    self._Cl *= 1.e12
+
+            if self.unit == 'MJy^2/sr':
+                self._Cl /= 1.e12
+
+        return self._Cl

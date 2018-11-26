@@ -33,7 +33,7 @@ def make_plot(freq):
         ax.loglog()
 
         # Limits
-        ax.set_xlim(40, 2000)
+        ax.set_xlim(80, 900)
 
         # Labels
         ax.legend()
@@ -41,10 +41,11 @@ def make_plot(freq):
         ax.set_ylabel(r'$C_{\ell}$')
 
 def main():
-    freq = '353'
-    make_plot(freq)
+    freqs = set(['217', '353', '545', '857'])
+    for freq in freqs:
+        make_plot(freq)
 
-    plt.savefig(f'autopower_comparison_{freq}GHz.pdf', dpi=300)
+        plt.savefig(f'autopower_comparison_{freq}GHz.pdf', dpi=300)
 
 
 if __name__ == "__main__":
