@@ -8,6 +8,7 @@ from astropy.io import fits
 from astropy.table import Table
 
 from .. import this_project as P
+from .. import utils as ut
 
 __all__ = [
     'Planck14Data',
@@ -281,6 +282,10 @@ class Planck14Model(CIBxCIB):
             if self.unit == 'MJy^2/sr':
                 self._Cl /= 1.e12
 
+            # Apply the correction factor to the PR1 calibration
+            self._Cl /= (
+                ut.PLANCK_PR1_CALCORR[str(self.freq1)] *
+                ut.PLANCK_PR1_CALCORR[str(self.freq2)])
         return self._Cl
 
     # Methods
@@ -360,6 +365,7 @@ class Maniyar18Model(CIBxCIB):
 
         return mapping[freq]
 
+
 class Planck14Data(CIBxCIB):
     def __init__(self, freq1, freq2=None, unit='Jy^2/sr'):
         super(Planck14Data, self).__init__(freq1, freq2=freq2, unit=unit)
@@ -406,6 +412,11 @@ class Planck14Data(CIBxCIB):
             if self.unit == 'MJy^2/sr':
                 self._Cl /= 1.e12
 
+            # Apply the correction factor to the PR1 calibration
+            self._Cl /= (
+                ut.PLANCK_PR1_CALCORR[str(self.freq1)] *
+                ut.PLANCK_PR1_CALCORR[str(self.freq2)])
+
         return self._Cl
 
     @property
@@ -424,5 +435,10 @@ class Planck14Data(CIBxCIB):
 
             if self.unit == 'MJy^2/sr':
                 self._dCl /= 1.e12
+            
+            # Apply the correction factor to the PR1 calibration
+            self._dCl /= (
+                ut.PLANCK_PR1_CALCORR[str(self.freq1)] *
+                ut.PLANCK_PR1_CALCORR[str(self.freq2)])
 
         return self._dCl

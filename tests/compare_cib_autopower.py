@@ -18,6 +18,7 @@ def make_plot(freq):
             hasattr(model, 'Cl')
         except KeyError:
             continue
+            # pass
 
         if model_name.lower().endswith('model'):
             ax.plot(
