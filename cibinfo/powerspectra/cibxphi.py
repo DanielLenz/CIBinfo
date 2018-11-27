@@ -12,7 +12,7 @@ __all__ = [
     'Planck13Data',
     'Planck13Model',
     'Maniyar18Model',
-    'GNILCxPlanckPR2', ]
+    'GNILCxPlanckPR3', ]
 
 
 class CIBxPhi():
@@ -198,7 +198,10 @@ class Maniyar18Model(CIBxPhi):
         return mapping[self.freqstr]
 
 
-class GNILCxPlanckPR2(CIBxPhi):
+class GNILCxPlanckPR3(CIBxPhi):
+    """INCONSISTENCY WARNING
+    THIS IS DONE IN KAPPA, NOT IN PHI!"""
+
     def __init__(self, freq, unit='Jy'):
         super().__init__(freq, unit=unit)
 
@@ -210,7 +213,7 @@ class GNILCxPlanckPR2(CIBxPhi):
             self._raw_table = pd.read_csv(
                 os.path.join(
                     P.PACKAGE_DIR,
-                    f'resources/cibxphi/gnilcxPhi_binned.csv'),
+                    f'resources/cibxphi/Cl_TK_GNILC{self.freq}.csv'),
                 comment='#')
 
         return self._raw_table
@@ -230,39 +233,19 @@ class GNILCxPlanckPR2(CIBxPhi):
     @property
     def Cl(self):
         if self._Cl is None:
-            self._Cl = self.l3Cl / self.l**3
+            # Native unit is Jy
+            self._Cl = self.raw_table['Cl'].values
+
+            if self.unit == 'uK.sr':
+                self._Cl *= self.Jy2K[self.freqstr] * 1.e6
+            if self.unit == 'MJy':
+                self._Cl /= 1.e6 
 
         return self._Cl
 
     @property
     def dCl(self):
-        if self._dCl is None:
-            self._dCl = self.dl3Cl / self.l**3
-        return self._dCl
-
-    @property
-    def l3Cl(self):
-        if self._l3Cl is None:
-
-            # Native unit is Jy
-            self._l3Cl = self.raw_table[f'l3Cl_{self.freq}'].values
-
-            if self.unit == 'uK.sr':
-                self._l3Cl *= self.Jy2K[self.freqstr] * 1.e6
-            if self.unit == 'MJy':
-                self._l3Cl /= 1.e6
-
-        return self._l3Cl
-
-    @property
-    def dl3Cl(self):
-        if self._dl3Cl is None:
-            # Native unit is Jy
-            self._dl3Cl = self.raw_table[f'dl3Cl_{self.freq}'].values
-
-            if self.unit == 'uK.sr':
-                self._dl3Cl *= self.Jy2K[self.freqstr] * 1.e6
-            if self.unit == 'MJy':
-                self._dl3Cl /= 1.e6
-
-        return self._dl3Cl
+        ...
+        # if self._dCl is None:
+        #     self._dCl = self.dl3Cl / self.l**3
+        # return self._dCl
