@@ -9,7 +9,8 @@ from .. import this_project as P
 
 
 __all__ = [
-    'Planck15Model', ]
+    'Planck15Model',
+    'Planck18Data', ]
 
 
 class CMBxCMB():
@@ -103,6 +104,61 @@ class Planck15Model(CMBxCMB):
         if self._l2Cl is None:
             # Native unit is uK^2/sr
             self._l2Cl = self.raw_table[self.mode].values
+
+            if self.unit == 'K^2.sr':
+                self._l2Cl /= 1.e12
+
+            if self.unit in ['MJy^2/sr', 'Jy^2/sr']:
+                self._l2Cl /= 1.e12  # from uK^2.sr to K^2.sr
+                self._l2Cl *= self.K2Jy[str(self.freq)]**2
+
+            if self.unit == 'MJy^2/sr':
+                self._l2Cl /= 1.e12
+
+        return self._l2Cl
+
+    @property
+    def Cl(self):
+        if self._Cl is None:
+            self._Cl = self.l2Cl / self.l_scaling
+
+        return self._Cl
+
+
+class Planck18Data(CMBxCMB):
+    """Planck PR3 CMB TT power spectrum, as measured on the data.
+    """
+    def __init__(self, freq=None, mode='TT', unit='uK^2.sr'):
+        super().__init__(
+            freq=freq, mode=mode, unit=unit)
+
+    # Properties
+    ############
+    @property
+    def raw_table(self):
+        if self._raw_table is None:
+            self._raw_table = np.loadtxt(os.path.join(
+                P.PACKAGE_DIR,
+                'resources/cmbxcmb/COM_PowerSpect_CMB-TT-full_R3.01.txt'))
+
+        return self._raw_table
+
+    @property
+    def l(self):
+        if self._l is None:
+            self._l = self.raw_table[:, 0]
+        return self._l
+
+    @property
+    def l_scaling(self):
+        return self.l*(self.l + 1) / 2. / np.pi
+
+    @property
+    def l2Cl(self):
+        """l(l+1)/2pi * Cl"""
+        if self._l2Cl is None:
+            # Native unit is uK^2/sr
+            self._l2Cl = self.raw_table[:, 1]
 
             if self.unit == 'K^2.sr':
                 self._l2Cl /= 1.e12
