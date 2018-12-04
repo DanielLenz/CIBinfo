@@ -6,12 +6,14 @@ import warnings
 
 import numpy as np
 import pandas as pd
+import healpy as hp
 
 from .. import this_project as P
 
 
 __all__ = [
     'SMICA',
+    'NILC',
 ]
 
 
@@ -70,6 +72,43 @@ class SMICA(WindowFunction):
                 'hence Pl is just unity.')
             
             self._Pl = np.ones_like(self.Bl, dtype=np.double)
+        return self._Pl 
+
+    @property
+    def Bl(self):
+        if self._Bl is None:
+            self._Bl = self.raw_table['Bl'].values
+
+        return self._Bl
+
+    @property
+    def Wl(self):
+        if self._Wl is None:
+            self._Wl = self.Pl * self.Bl
+
+        return self._Wl
+
+
+class NILC(WindowFunction):
+    def __init__(self, nside):
+        super().__init__()
+        self.nside = nside
+
+    @property
+    def raw_table(self):
+        if self._raw_table is None:
+            self._raw_table = pd.read_csv(
+                os.path.join(
+                    P.PACKAGE_DIR,
+                    'resources/instruments/Bl_nilc.csv'),
+                comment='#',)
+        
+        return self._raw_table
+
+    @property
+    def Pl(self):
+        if self._Pl is None:
+            self._Pl = hp.pixwin(self.nside)[:self.Bl.size]
         return self._Pl 
 
     @property
