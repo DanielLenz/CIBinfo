@@ -6,6 +6,7 @@ import pandas as pd
 import os
 
 from .. import this_project as P
+from .. import utils as ut
 
 
 __all__ = [
@@ -83,6 +84,10 @@ class Planck13Data(CIBxPhi):
                 self._l3Cl *= self.K2Jy[self.freqstr] / 1.e6
             if self.unit == 'MJy':
                 self._l3Cl *= self.K2Jy[self.freqstr] / 1.e12
+            
+            # Apply the correction factor to the PR1 calibration
+            self._l3Cl /= (
+                ut.PLANCK_PR1_CALCORR[self.freqstr])
 
         return self._l3Cl
 
@@ -103,6 +108,11 @@ class Planck13Data(CIBxPhi):
                 self._dl3Cl *= self.K2Jy[self.freqstr] / 1.e6
             if self.unit == 'MJy':
                 self._dl3Cl *= self.K2Jy[self.freqstr] / 1.e12
+            
+            # Apply the correction factor to the PR1 calibration
+            self._dl3Cl /= (
+                ut.PLANCK_PR1_CALCORR[self.freqstr])
+
         return self._dl3Cl
 
     @property
@@ -138,6 +148,10 @@ class Planck13Model(CIBxPhi):
                 self._l3Cl *= self.Jy2K[self.freqstr] * 1.e6
             if self.unit == 'MJy':
                 self._l3Cl /= 1.e6
+
+            # Apply the correction factor to the PR1 calibration
+            self._l3Cl /= (
+                ut.PLANCK_PR1_CALCORR[self.freqstr])
 
         return self._l3Cl
 
