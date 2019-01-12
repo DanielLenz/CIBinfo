@@ -388,7 +388,7 @@ class Planck14Data(CIBxCIB):
     @property
     def l(self):
         if self._l is None:
-            self._l = self.raw_table['ell']
+            self._l = self.raw_table['ell'].data.data
 
         return self._l
 
@@ -396,7 +396,7 @@ class Planck14Data(CIBxCIB):
     def Cl(self):
         if self._Cl is None:
             # Native unit is Jy^2/sr
-            self._Cl = self.raw_table[f'{self.freq1}x{self.freq2}']
+            self._Cl = self.raw_table[f'{self.freq1}x{self.freq2}'].data.data
 
             # We add the shot noise, which is also in Jy^2/sr
             # self._Cl += self.S
@@ -423,7 +423,7 @@ class Planck14Data(CIBxCIB):
     def dCl(self):
         if self._dCl is None:
             # Native unit is Jy^2/sr
-            self._dCl = self.raw_table[f'd{self.freq1}x{self.freq2}']
+            self._dCl = self.raw_table[f'd{self.freq1}x{self.freq2}'].data.data
 
             if self.unit in ['K^2.sr', 'uK^2.sr']:
                 self._dCl *= (
