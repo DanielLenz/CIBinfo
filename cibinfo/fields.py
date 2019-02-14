@@ -19,15 +19,9 @@ from .powerspectra import (
 )
 
 
-"""Mapping of units of the CIB auto power spectrum (e.g. MJy^2/sr) to
-units of the cross power spectrum with the lensing (e.g. MJy).
-"""
-unit_converter = {"MJy^2/sr": "MJy", "Jy^2/sr": "Jy", "uK^2.sr": "uK", "K^2.sr": "K"}
-
-
 class SimCl:
     """Handles power spectra for the CIB, CMB, and the lensing convergence kappa
-    in a consistent manner.
+    in a consistent manner. 
     
     Examples
     --------
@@ -39,6 +33,7 @@ class SimCl:
     """
 
     _ell = None
+    _ell_data = None
 
     _tt = None          # CIB Cl
     _tt_data = None     # CIB P14 Cl data
@@ -54,6 +49,15 @@ class SimCl:
         self.freq = freq
         self.unit = unit
 
+    @staticmethod
+    def autopower2crosspower_units(autopower_unit: str) -> str:
+        """Mapping of units of the CIB auto power spectrum (e.g. MJy^2/sr) to
+        units of the cross power spectrum with the lensing (e.g. MJy).
+        """
+        conv = {"MJy^2/sr": "MJy", "Jy^2/sr": "Jy", "uK^2.sr": "uK", "K^2.sr": "K"}
+
+        return conv[autopower_unit]
+
     @property
     def lmax_sim(self):
         """The maximum ell of all the different power spectrum models used
@@ -65,6 +69,12 @@ class SimCl:
         if self._ell is None:
             self._ell = np.arange(self.lmax_sim)
         return self._ell
+
+    @property
+    def ell_data(self):
+        if self._ell_data is None:
+            self._ell_data = TT.Planck14Data(self.freq, unit=self.unit).l
+        return self._ell_data
 
     @property
     def tt_data(self):
@@ -101,7 +111,9 @@ class SimCl:
     @property
     def tk(self):
         if self._tk is None:
-            self._tk = TK.Maniyar18Model(self.freq, unit=unit_converter[self.unit]).Cl
+            self._tk = TK.Maniyar18Model(
+                self.freq,
+                unit=self.autopower2crosspower_units[self.unit]).Cl
 
             # The monopole is missing, so we simply add one by hand
             self._tk = np.concatenate(([self._tk[0]], self._tk))[: self.lmax_sim]
