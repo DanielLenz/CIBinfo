@@ -267,17 +267,17 @@ class CorrField(Field):
         lmax=None,
     ):
 
-        _lmax = None
-        _Cl_XX = None
-        _Cl_YY = None
-        _Nl_XX = None
-        _Nl_YY = None
-        _Cl_XY = None
+        self._lmax = None
+        self._Cl_XX = None
+        self._Cl_YY = None
+        self._Nl_XX = None
+        self._Nl_YY = None
+        self._Cl_XY = None
 
-        _hpxmap_X = None
-        _hpxmap_Y = None
-        _noisemap_X = None
-        _noisemap_Y = None
+        self._hpxmap_X = None
+        self._hpxmap_Y = None
+        self._noisemap_X = None
+        self._noisemap_Y = None
 
         super().__init__(nside=nside, lmax=lmax)
 
