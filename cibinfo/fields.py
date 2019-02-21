@@ -159,10 +159,10 @@ class Field:
     @lmax.setter
     def lmax(self, value):
         if value is None:
-            # ell=1998 is the upper limit for the simulated Cls
+            # ell=2500 is the upper limit for the simulated Cls
             # We use either that, or the typical 3*nside to simulate the
             # maps
-            self._lmax = min(1998, 3 * self.nside)
+            self._lmax = min(2500, 3 * self.nside)
         elif not isinstance(value, int):
             raise TypeError("lmax must be int or None.")
         else:
