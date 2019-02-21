@@ -142,9 +142,9 @@ class SimCl:
 class Field:
     """Base class for Gaussian random fields"""
 
-    _lmax = None
 
     def __init__(self, nside=1024, lmax=None):
+        _lmax = None
         self.nside = nside
         self.lmax = lmax
 
@@ -168,13 +168,6 @@ class Field:
         else:
             self._lmax = value
 
-    @property
-    def Cl(self):
-        raise NotImplementedError()
-
-    @property
-    def alm(self):
-        raise NotImplementedError()
 
 
 # class CIB(Field):
@@ -259,12 +252,6 @@ class Field:
 
 class CorrField(Field):
 
-    _lmax = None
-    _Cl_XX = None
-    _Cl_YY = None
-    _Nl_XX = None
-    _Nl_YY = None
-    _Cl_XY = None
 
     def __init__(
         self,
@@ -280,6 +267,18 @@ class CorrField(Field):
         lmax=None,
     ):
 
+        _lmax = None
+        _Cl_XX = None
+        _Cl_YY = None
+        _Nl_XX = None
+        _Nl_YY = None
+        _Cl_XY = None
+
+        _hpxmap_X = None
+        _hpxmap_Y = None
+        _noisemap_X = None
+        _noisemap_Y = None
+
         super().__init__(nside=nside, lmax=lmax)
 
         self.unit = unit
@@ -289,6 +288,9 @@ class CorrField(Field):
         self.fwhm2 = fwhm2
         self.add_noise1 = add_noise1
         self.add_noise2 = add_noise2
+
+        # Initialize simulation with first realization
+        self.generate()
 
     @property
     def Cl_XX(self):
@@ -393,6 +395,9 @@ class CIBxCIB(CorrField):
         lmax=None,
     ):
 
+
+        self.sim_cl = SimCl(freq=freq, unit=unit)
+
         super().__init__(
             freq=freq,
             unit=unit,
@@ -406,7 +411,7 @@ class CIBxCIB(CorrField):
             lmax=lmax,
         )
 
-        self.sim_cl = SimCl(freq=freq, unit=unit)
+        
 
     @property
     def Cl_XX(self):
@@ -436,16 +441,16 @@ class CIBxCIB(CorrField):
     def generate_signal(self):
         self.alm = hp.synalm(self.Cl_XX)
 
-    def generate_noise(self):
-        if self.add_noise1:
-            self.noisemap_X = hp.synfast(self.Nl_XX, nside=self.nside, pol=False)
-        else:
-            self.noisemap_X = np.zeros(self.npix)
+    # def generate_noise(self):
+    #     if self.add_noise1:
+    #         self.noisemap_X = hp.synfast(self.Nl_XX, nside=self.nside, pol=False)
+    #     else:
+    #         self.noisemap_X = np.zeros(self.npix)
 
-        if self.add_noise2:
-            self.noisemap_Y = hp.synfast(self.Nl_XX, nside=self.nside, pol=False)
-        else:
-            self.noisemap_Y = np.zeros(self.npix)
+    #     if self.add_noise2:
+    #         self.noisemap_Y = hp.synfast(self.Nl_XX, nside=self.nside, pol=False)
+    #     else:
+    #         self.noisemap_Y = np.zeros(self.npix)
 
     @property
     def hpxmap_X(self):
