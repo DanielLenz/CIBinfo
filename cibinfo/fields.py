@@ -230,7 +230,7 @@ class Field(BaseField):
         self._cl = val[:self.lmax]
 
     def generate(self):
-        self.alm = hp.synalm(self.cl)
+        self.alm = hp.synalm(self.cl, verbose=False)
 
     def observe(self, beam=None, pixwin: bool=False):
         """
