@@ -1,5 +1,45 @@
 import numpy as np
 
+
+def adjust_cl_length(cl, lmax=None, nside=None):
+    """Many functions requires the Cl to have a length of exactly
+    lmax or of 3 * nside. This function returns a Cl that is either cut
+    or extended to fit this need.
+
+    If the input Cl is too long, it is simply truncated.
+
+    If the input Cl is too short, then the last element is
+    simply repeated until the length is 3*nside or lmax.
+
+    Parameters
+    ----------
+    cl: Input Cl, 1D np.ndarray
+    nside: int, Valid HEALPix nside
+    lmax: int, lmax
+    """
+    if lmax and nside:
+        raise RuntimeError("Must provide nside OR lmax")
+
+    if lmax is None:
+        lmax = 3 * nside
+    # > 0 if too short, < 0 if too long
+    len_diff = lmax - cl.shape[0]
+
+    # Just return for perfect match
+    if len_diff == 0:
+        return cl
+
+    # Extend if too short
+    if len_diff > 0:
+        cl = np.concatenate((cl, np.repeat(cl[-1], repeats=len_diff)))
+
+    # Cut if too long
+    else:
+        cl = cl[:lmax]
+
+    return cl
+
+
 # Planck calibration correction to compare PR1 and PR2
 # The convention is that PR2 = PR1 / C for the maps
 # For powerspectra, the conversion factor needs to be applied
