@@ -76,7 +76,7 @@ class SimCl:
         if not type(val) == str:
             raise TypeError("Freq must be str")
         if val not in ['143', '217', '353', '545', '857']:
-            raise ValueError()
+            raise ValueError("Freq must be in ['143', '217', '353', '545', '857']")
         else:
             self._freq = val
 
@@ -232,7 +232,7 @@ class Field(BaseField):
     def generate(self):
         self.alm = hp.synalm(self.cl, verbose=False)
 
-    def observe(self, beam=None, pixwin: bool=False):
+    def observe(self, beam=0., pixwin: bool=False):
         """
         Converts the theoretical, randomized alm into an actual observed hpxmap.
         Can contain a beam and pixel window function
@@ -240,8 +240,7 @@ class Field(BaseField):
         ----------
         beam: None, float, or np.ndarray
             Beam function to convolve the alms with.
-            - If None, no beam is applied
-            - If float, uses this as FWHM in degrees of the Gaussian beam
+            - If float, uses this as FWHM in degrees of the Gaussian beam. No beam is applied to beam=0.
             - If np.ndarray, uses this as actual beam window function
         """
         # Convert beam to Gaussian beam func if it's float
@@ -251,9 +250,6 @@ class Field(BaseField):
         # Adjust length if beamfunc is given
         if isinstance(beam, np.ndarray):
             beam = ut.adjust_cl_length(beam, lmax=self.lmax)
-
-        if beam is None:
-            beam = np.ones(self.lmax)
 
         alm_obs = hp.almxfl(self.alm, fl=beam)
 
