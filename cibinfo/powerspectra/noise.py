@@ -63,7 +63,7 @@ class DifferenceSpectrum:
         value = str(value)
 
         # TODO go back and also add the 143 GHz data
-        allowed = {'100', '217', '353', '545', '857'}
+        allowed = {'100', '143', '217', '353', '545', '857'}
 
         if value not in allowed:
             raise ValueError(f'freq must be in {allowed}')
@@ -186,8 +186,7 @@ class PlanckPR3(DifferenceSpectrum):
 
         value = str(value)
 
-        # TODO go back and also add the 100 and 143 GHz data
-        allowed = {'217', '353', '545', '857'}
+        allowed = {'100', '143', '217', '353', '545', '857'}
 
         if value not in allowed:
             raise ValueError(f'freq must be in {allowed}')
