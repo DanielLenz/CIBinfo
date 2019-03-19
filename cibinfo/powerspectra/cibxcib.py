@@ -437,7 +437,7 @@ class Planck14Data(CIBxCIB):
         return self._dDl
 
 
-class Mak18(CIBxCIB):
+class Mak17(CIBxCIB):
     def __init__(
         self,
         freq1: str,
@@ -446,21 +446,19 @@ class Mak18(CIBxCIB):
         unit: str = "uK2.sr",
         mask="mask30",
     ):
-        self.unit = unit
-        self._Cl = None
-        self._Dl = None
+        super().__init__(freq1, freq2=freq2, unit=unit)
 
         if lmax is None:
             self.lmax = 3000
         else:
             self.lmax = lmax
 
-        self.freq1 = freq1
-        if freq2 is None:
-            self.freq2 = freq1
-        else:
-            self.freq2 = freq2
-
+        #         self.freq1 = freq1
+        #         if freq2 is None:
+        #             self.freq2 = freq1
+        #         else:
+        #             self.freq2 = freq2
+        #
         self.mask = mask
 
     @property
@@ -548,9 +546,9 @@ class Mak18(CIBxCIB):
 
         return d
 
-    def calibration(self, freq1: str, freq2: str):
+    def calibration(self, freq1: int, freq2: int):
         raw_data = self._raw_data[self.mask]
-        cal1, cal2 = raw_data["cal"][freq1], raw_data["cal"][freq2]
+        cal1, cal2 = raw_data["cal"][str(freq1)], raw_data["cal"][str(freq2)]
 
         return cal1 * cal2
 
@@ -565,16 +563,25 @@ class Mak18(CIBxCIB):
         gamma = raw_data["gamma"]
 
         A_cib = rho_cib * np.sqrt(
-            raw_data["cib"][self.freq1] * raw_data["cib"][self.freq2]
+            raw_data["cib"][str(self.freq1)] * raw_data["cib"][str(self.freq2)]
         )
 
-        A_ps = rho_ps * np.sqrt(raw_data["ps"][self.freq1] * raw_data["ps"][self.freq2])
+        A_ps = rho_ps * np.sqrt(
+            raw_data["ps"][str(self.freq1)] * raw_data["ps"][str(self.freq2)]
+        )
 
         return gamma, A_cib, A_ps
 
     @property
     def Cl(self):
-        return self.Dl / (self.l * (self.l + 1)) * 2.0 * np.pi
+        """
+        We copy the dipole for the monopole, because it would naturally be inf due to
+        the division by zero.
+        """
+        _Cl = self.Dl / (self.l * (self.l + 1)) * 2.0 * np.pi
+        _Cl = np.concatenate([_Cl[1:2], _Cl[1:]])
+
+        return _Cl
 
     @property
     def Dl(self):
@@ -585,8 +592,10 @@ class Mak18(CIBxCIB):
 
             if self.unit == "K^2.sr":
                 self._Dl /= 1.0e12
-            if self.unit == "MJy^2/sr":
-                self._Dl *= 1.0e-12 * (self.K2MJy[self.freq1] * self.K2MJy[self.freq2])
             if self.unit == "Jy^2/sr":
-                self._Dl *= self.K2MJy[self.freq1] * self.K2MJy[self.freq2]
+                self._Dl *= 1.0e-12 * (
+                    self.K2Jy[str(self.freq1)] * self.K2Jy[str(self.freq2)]
+                )
+            if self.unit == "MJy^2/sr":
+                self._Dl *= self.K2Jy[str(self.freq1)] * self.K2Jy[str(self.freq2)]
         return self._Dl
