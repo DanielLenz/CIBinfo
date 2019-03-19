@@ -1,5 +1,4 @@
-from __future__ import (absolute_import, division, print_function,
-                        unicode_literals)
+from __future__ import absolute_import, division, print_function, unicode_literals
 
 import numpy as np
 import pandas as pd
@@ -9,14 +8,10 @@ from .. import this_project as P
 from .. import utils as ut
 
 
-__all__ = [
-    'Planck13Data',
-    'Planck13Model',
-    'Maniyar18Model',
-    'GNILCxPlanckPR3', ]
+__all__ = ["Planck13Data", "Planck13Model", "Maniyar18Model", "GNILCxPlanckPR3"]
 
 
-class CIBxPhi():
+class CIBxPhi:
 
     _l = None  # multipole
 
@@ -28,8 +23,8 @@ class CIBxPhi():
 
     _raw_table = None  # raw table, taken from publications, emails, etc
 
-    def __init__(self, freq, unit='Jy'):
-        if unit not in ['Jy', 'MJy', 'uK.sr']:
+    def __init__(self, freq, unit="Jy"):
+        if unit not in ["Jy", "MJy", "uK.sr"]:
             raise ValueError('Unit must be either "Jy", "MJy", or "uK.sr"')
         self.unit = unit
 
@@ -60,7 +55,7 @@ class CIBxPhi():
 
 
 class Planck13Data(CIBxPhi):
-    def __init__(self, freq, unit='uK.sr'):
+    def __init__(self, freq, unit="uK.sr"):
         super(Planck13Data, self).__init__(freq, unit=unit)
 
     # Properties
@@ -68,10 +63,13 @@ class Planck13Data(CIBxPhi):
     @property
     def raw_table(self):
         if self._raw_table is None:
-            self._raw_table = np.genfromtxt(os.path.join(
-                P.PACKAGE_DIR,
-                'resources/cibxphi/Planck13_data_{}.dat'.format(self.freq)),
-                usecols=[0, 1, 2])
+            self._raw_table = np.genfromtxt(
+                os.path.join(
+                    P.PACKAGE_DIR,
+                    "resources/cibxphi/Planck13_data_{}.dat".format(self.freq),
+                ),
+                usecols=[0, 1, 2],
+            )
         return self._raw_table
 
     @property
@@ -80,21 +78,20 @@ class Planck13Data(CIBxPhi):
             # native unit is uK*sr
             self._l3Cl = self.raw_table[:, 1].copy()
 
-            if self.unit == 'Jy':
-                self._l3Cl *= self.K2Jy[self.freqstr] / 1.e6
-            if self.unit == 'MJy':
-                self._l3Cl *= self.K2Jy[self.freqstr] / 1.e12
-            
+            if self.unit == "Jy":
+                self._l3Cl *= self.K2Jy[self.freqstr] / 1.0e6
+            if self.unit == "MJy":
+                self._l3Cl *= self.K2Jy[self.freqstr] / 1.0e12
+
             # Apply the correction factor to the PR1 calibration
-            self._l3Cl /= (
-                ut.PLANCK_PR1_CALCORR[self.freqstr])
+            self._l3Cl /= ut.PLANCK_PR1_CALCORR[self.freqstr]
 
         return self._l3Cl
 
     @property
     def Cl(self):
         if self._Cl is None:
-            self._Cl = self.l3Cl / self.l**3
+            self._Cl = self.l3Cl / self.l ** 3
 
         return self._Cl
 
@@ -104,27 +101,26 @@ class Planck13Data(CIBxPhi):
             # native unit is uK*sr
             self._dl3Cl = self.raw_table[:, 2].copy()
 
-            if self.unit == 'Jy':
-                self._dl3Cl *= self.K2Jy[self.freqstr] / 1.e6
-            if self.unit == 'MJy':
-                self._dl3Cl *= self.K2Jy[self.freqstr] / 1.e12
-            
+            if self.unit == "Jy":
+                self._dl3Cl *= self.K2Jy[self.freqstr] / 1.0e6
+            if self.unit == "MJy":
+                self._dl3Cl *= self.K2Jy[self.freqstr] / 1.0e12
+
             # Apply the correction factor to the PR1 calibration
-            self._dl3Cl /= (
-                ut.PLANCK_PR1_CALCORR[self.freqstr])
+            self._dl3Cl /= ut.PLANCK_PR1_CALCORR[self.freqstr]
 
         return self._dl3Cl
 
     @property
     def dCl(self):
         if self._dCl is None:
-            self._dCl = self.dl3Cl / self.l**3
+            self._dCl = self.dl3Cl / self.l ** 3
 
         return self._dCl
 
 
 class Planck13Model(CIBxPhi):
-    def __init__(self, freq, unit='Jy'):
+    def __init__(self, freq, unit="Jy"):
         super(Planck13Model, self).__init__(freq, unit=unit)
 
     # Properties
@@ -132,10 +128,13 @@ class Planck13Model(CIBxPhi):
     @property
     def raw_table(self):
         if self._raw_table is None:
-            self._raw_table = np.genfromtxt(os.path.join(
-                P.PACKAGE_DIR,
-                'resources/cibxphi/Planck13_model_{}.txt'.format(self.freq)),
-                usecols=[0, 1])
+            self._raw_table = np.genfromtxt(
+                os.path.join(
+                    P.PACKAGE_DIR,
+                    "resources/cibxphi/Planck13_model_{}.txt".format(self.freq),
+                ),
+                usecols=[0, 1],
+            )
         return self._raw_table
 
     @property
@@ -144,26 +143,25 @@ class Planck13Model(CIBxPhi):
             # native unit is Jy
             self._l3Cl = self.raw_table[:, 1].copy()
 
-            if self.unit == 'uK.sr':
-                self._l3Cl *= self.Jy2K[self.freqstr] * 1.e6
-            if self.unit == 'MJy':
-                self._l3Cl /= 1.e6
+            if self.unit == "uK.sr":
+                self._l3Cl *= self.Jy2K[self.freqstr] * 1.0e6
+            if self.unit == "MJy":
+                self._l3Cl /= 1.0e6
 
             # Apply the correction factor to the PR1 calibration
-            self._l3Cl /= (
-                ut.PLANCK_PR1_CALCORR[self.freqstr])
+            self._l3Cl /= ut.PLANCK_PR1_CALCORR[self.freqstr]
 
         return self._l3Cl
 
     @property
     def Cl(self):
         if self._Cl is None:
-            self._Cl = self.l3Cl / self.l**3
+            self._Cl = self.l3Cl / self.l ** 3
         return self._Cl
 
 
 class Maniyar18Model(CIBxPhi):
-    def __init__(self, freq, unit='Jy'):
+    def __init__(self, freq, unit="Jy"):
         super(Maniyar18Model, self).__init__(freq, unit=unit)
 
     # Properties
@@ -172,9 +170,8 @@ class Maniyar18Model(CIBxPhi):
     def raw_table(self):
         if self._raw_table is None:
             self._raw_table = np.loadtxt(
-                os.path.join(
-                    P.PACKAGE_DIR,
-                    'resources/cibxphi/Maniyar18_model.dat'))
+                os.path.join(P.PACKAGE_DIR, "resources/cibxphi/Maniyar18_model.dat")
+            )
         return self._raw_table
 
     @property
@@ -183,31 +180,24 @@ class Maniyar18Model(CIBxPhi):
             # native unit is Jy
             self._l3Cl = self.raw_table[:, self._freq2col(self.freqstr)].copy()
 
-            if self.unit == 'uK.sr':
-                self._l3Cl *= self.Jy2K[self.freqstr] * 1.e6
-            if self.unit == 'MJy':
-                self._l3Cl /= 1.e6
+            if self.unit == "uK.sr":
+                self._l3Cl *= self.Jy2K[self.freqstr] * 1.0e6
+            if self.unit == "MJy":
+                self._l3Cl /= 1.0e6
 
         return self._l3Cl
 
     @property
     def Cl(self):
         if self._Cl is None:
-            self._Cl = self.l3Cl / self.l**3
+            self._Cl = self.l3Cl / self.l ** 3
         return self._Cl
 
     # Methods
     #########
     def _freq2col(self, freqstr):
         # ell, Phix100, Phix143, Phix217, Phix353, Phix545, Phix857
-        mapping = {
-            '100': 1,
-            '143': 2,
-            '217': 3,
-            '353': 4,
-            '545': 5,
-            '857': 6,
-        }
+        mapping = {"100": 1, "143": 2, "217": 3, "353": 4, "545": 5, "857": 6}
 
         return mapping[self.freqstr]
 
@@ -216,7 +206,7 @@ class GNILCxPlanckPR3(CIBxPhi):
     """INCONSISTENCY WARNING
     THIS IS DONE IN KAPPA, NOT IN PHI!"""
 
-    def __init__(self, freq, unit='Jy'):
+    def __init__(self, freq, unit="Jy"):
         super().__init__(freq, unit=unit)
 
     # Properties
@@ -226,16 +216,17 @@ class GNILCxPlanckPR3(CIBxPhi):
         if self._raw_table is None:
             self._raw_table = pd.read_csv(
                 os.path.join(
-                    P.PACKAGE_DIR,
-                    f'resources/cibxphi/Cl_TK_GNILC{self.freq}.csv'),
-                comment='#')
+                    P.PACKAGE_DIR, f"resources/cibxphi/Cl_TK_GNILC{self.freq}.csv"
+                ),
+                comment="#",
+            )
 
         return self._raw_table
 
     @property
     def l(self):
         if self._l is None:
-            self._l = self.raw_table['ell'].values
+            self._l = self.raw_table["ell"].values
         return self._l
 
     # @property
@@ -248,18 +239,24 @@ class GNILCxPlanckPR3(CIBxPhi):
     def Cl(self):
         if self._Cl is None:
             # Native unit is Jy
-            self._Cl = self.raw_table['Cl'].values
+            self._Cl = self.raw_table["Cl"].values
 
-            if self.unit == 'uK.sr':
-                self._Cl *= self.Jy2K[self.freqstr] * 1.e6
-            if self.unit == 'MJy':
-                self._Cl /= 1.e6 
+            if self.unit == "uK.sr":
+                self._Cl *= self.Jy2K[self.freqstr] * 1.0e6
+            if self.unit == "MJy":
+                self._Cl /= 1.0e6
 
         return self._Cl
 
     @property
     def dCl(self):
-        ...
-        # if self._dCl is None:
-        #     self._dCl = self.dl3Cl / self.l**3
-        # return self._dCl
+        if self._dCl is None:
+            # Native unit is Jy
+            self._dCl = self.raw_table["dCl"].values
+
+            if self.unit == "uK.sr":
+                self._dCl *= self.Jy2K[self.freqstr] * 1.0e6
+            if self.unit == "MJy":
+                self._dCl /= 1.0e6
+
+        return self._dCl
