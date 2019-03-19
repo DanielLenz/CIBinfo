@@ -80,7 +80,7 @@ class CIBxCIB():
     @property
     def Dl(self):
         if self._Dl is None:
-            self._Dl = l*(l+1.)/2./np.pi * self.Cl
+            self._Dl = self.l*(self.l+1.)/2./np.pi * self.Cl
         return self._Dl
 
     @property
