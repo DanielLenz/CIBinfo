@@ -23,7 +23,9 @@ class CIBxCIB():
     _Cl = None  # angular power
     _dCl = None  # uncertainty on the angular power
     _Dl = None  # l(l+1)/2pi * Cl
+    _dDl = None  # uncertainty on the angular power
     _l3Cl = None  # l**3 * Cl
+
     _S = None  # shot noise level
     _dS = None  # uncertainty on the shot noise
 
@@ -369,7 +371,6 @@ class Maniyar18Model(CIBxCIB):
 class Planck14Data(CIBxCIB):
     def __init__(self, freq1, freq2=None, unit='Jy^2/sr'):
         super(Planck14Data, self).__init__(freq1, freq2=freq2, unit=unit)
-
         self.Cl_contains_SN = True
 
     # Properties
@@ -442,3 +443,9 @@ class Planck14Data(CIBxCIB):
                 ut.PLANCK_PR1_CALCORR[str(self.freq2)])
 
         return self._dCl
+
+    @property
+    def dDl(self):
+        if self._dDl is None:
+            self._dDl = l*(l+1.)/2./np.pi * self.dCl
+        return self._dDl
