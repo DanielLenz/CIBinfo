@@ -599,3 +599,8 @@ class Mak17Model(CIBxCIB):
             if self.unit == "MJy^2/sr":
                 self._Dl *= self.K2Jy[str(self.freq1)] * self.K2Jy[str(self.freq2)]
         return self._Dl
+
+
+class Mak17(Mak17Model):
+    """We keep this copy of the Mak17Model to ensure downward compatibility."""
+    pass
