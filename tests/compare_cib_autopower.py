@@ -12,14 +12,15 @@ def make_plot(freq: str, ell_scaling="l0", logx=False, logy=False, outdir=None) 
         raise TypeError("freq must be str")
 
     model_names = ["Planck14Model", "Maniyar18Model", "Mak17Model", "Planck14Data"]
+    model_names = ["Planck14Model", "Mak17Model", "Planck14Data"]
 
     _, ax = plt.subplots(figsize=(6, 4))
 
     for model_name in model_names:
         if model_name == "Mak17Model":
-            model = getattr(TT, model_name)(freq, mask='mask40', unit="Jy^2/sr")
+            model = getattr(TT, model_name)(freq, mask='mask40', unit="uK^2.sr")
         else:
-            model = getattr(TT, model_name)(freq, unit="Jy^2/sr")
+            model = getattr(TT, model_name)(freq, unit="uK^2.sr")
         try:
             hasattr(model, "Cl")
         except KeyError:
@@ -100,7 +101,7 @@ def main():
     freqs = set(["353", "545", "857"])
 
     for freq in freqs:
-        make_plot(freq, ell_scaling="l1", logx=False, logy=False, outdir=outdir)
+        make_plot(freq, ell_scaling="l2", logx=False, logy=False, outdir=outdir)
 
 
 if __name__ == "__main__":

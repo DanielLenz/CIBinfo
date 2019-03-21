@@ -265,7 +265,7 @@ class Planck14Model(CIBxCIB):
             # Possibly convert the units
             if self.unit in ["K^2.sr", "uK^2.sr"]:
                 self._Cl *= self.Jy2K[str(self.freq1)] * self.Jy2K[str(self.freq2)]
-                if self.unit == ["uK^2.sr"]:
+                if self.unit == "uK^2.sr":
                     self._Cl *= 1.0e12
 
             if self.unit == "MJy^2/sr":
