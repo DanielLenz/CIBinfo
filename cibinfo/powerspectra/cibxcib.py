@@ -437,7 +437,7 @@ class Planck14Data(CIBxCIB):
         return self._dDl
 
 
-class Mak17(CIBxCIB):
+class Mak17Model(CIBxCIB):
     def __init__(
         self,
         freq1: str,

@@ -1,14 +1,17 @@
+from pathlib import Path
+from typing import Optional
+
 import numpy as np
 import matplotlib.pyplot as plt
 
 from cibinfo.powerspectra import cibxcib as TT
 
 
-def make_plot(freq):
+def make_plot(freq: str, outdir=None) -> None:
     if not isinstance(freq, str):
         raise TypeError('freq must be str')
 
-    model_names = ['Planck14Data', 'Planck14Model', 'Maniyar18Model']
+    model_names = ['Planck14Data', 'Planck14Model', 'Maniyar18Model', 'Mak17']
 
     _, ax = plt.subplots(figsize=(6, 4))
 
@@ -48,13 +51,19 @@ def make_plot(freq):
         ax.set_xlabel(r'$\ell$')
         ax.set_ylabel(r'$C_{\ell}$')
 
-        plt.savefig(f'autopower_comparison_{freq}GHz.pdf', dpi=300)
+        if outdir is not None:
+            outdir.mkdir(exist_ok=True, parents=True)
+            plt.savefig(
+                outdir.joinpath(f'autopower_comparison_{freq}GHz.pdf'),
+                dpi=300)
 
 
 def main():
-    freqs = set(['217', '353', '545', '857'])
+    outdir = Path('figures/')
+    freqs = set(['353', '545', '857'])
+
     for freq in freqs:
-        make_plot(freq)
+        make_plot(freq, outdir=outdir)
 
 
 if __name__ == "__main__":
