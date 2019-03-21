@@ -444,7 +444,7 @@ class Mak17Model(CIBxCIB):
         freq2: Optional[str] = None,
         lmax: Optional[int] = None,
         unit: str = "uK2.sr",
-        mask="mask30",
+        mask="mask40",
     ):
         super().__init__(freq1, freq2=freq2, unit=unit)
 
