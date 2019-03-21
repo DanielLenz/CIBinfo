@@ -84,7 +84,7 @@ class Planck13Data(CIBxPhi):
                 self._l3Cl *= self.K2Jy[self.freqstr] / 1.0e12
 
             # Apply the correction factor to the PR1 calibration
-            self._l3Cl /= ut.PLANCK_PR1_CALCORR[self.freqstr]
+            self._l3Cl /= ut.PLANCK_PR1PR3_CALCORR[self.freqstr]
 
         return self._l3Cl
 
@@ -107,7 +107,7 @@ class Planck13Data(CIBxPhi):
                 self._dl3Cl *= self.K2Jy[self.freqstr] / 1.0e12
 
             # Apply the correction factor to the PR1 calibration
-            self._dl3Cl /= ut.PLANCK_PR1_CALCORR[self.freqstr]
+            self._dl3Cl /= ut.PLANCK_PR1PR3_CALCORR[self.freqstr]
 
         return self._dl3Cl
 
@@ -149,7 +149,7 @@ class Planck13Model(CIBxPhi):
                 self._l3Cl /= 1.0e6
 
             # Apply the correction factor to the PR1 calibration
-            self._l3Cl /= ut.PLANCK_PR1_CALCORR[self.freqstr]
+            self._l3Cl /= ut.PLANCK_PR1PR3_CALCORR[self.freqstr]
 
         return self._l3Cl
 

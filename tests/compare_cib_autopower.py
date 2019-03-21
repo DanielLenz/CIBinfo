@@ -6,21 +6,35 @@ import matplotlib.pyplot as plt
 
 from cibinfo.powerspectra import cibxcib as TT
 
+UNIT_STR = {
+    "MJy^2/sr": r"$\ [\rm MJy^2/sr$]",
+    "Jy^2/sr": r"$\ [\rm Jy^2/sr$]",
+    "K^2.sr": r"$\ [\rm K^2\,sr$]",
+    "uK^2.sr": r"$\ [\rm \mu K^2\,sr$]",
+}
 
-def make_plot(freq: str, ell_scaling="l0", logx=False, logy=False, outdir=None) -> None:
+
+def make_plot(
+    freq: str,
+    unit: str = "Jy^2/sr",
+    ell_scaling="l0",
+    logx=False,
+    logy=False,
+    outdir=None,
+) -> None:
     if not isinstance(freq, str):
         raise TypeError("freq must be str")
 
-    model_names = ["Planck14Model", "Maniyar18Model", "Mak17Model", "Planck14Data"]
+    # model_names = ["Planck14Model", "Maniyar18Model", "Mak17Model", "Planck14Data"]
     model_names = ["Planck14Model", "Mak17Model", "Planck14Data"]
 
     _, ax = plt.subplots(figsize=(6, 4))
 
     for model_name in model_names:
         if model_name == "Mak17Model":
-            model = getattr(TT, model_name)(freq, mask='mask40', unit="uK^2.sr")
+            model = getattr(TT, model_name)(freq, mask="mask40", unit=unit)
         else:
-            model = getattr(TT, model_name)(freq, unit="uK^2.sr")
+            model = getattr(TT, model_name)(freq, unit=unit)
         try:
             hasattr(model, "Cl")
         except KeyError:
@@ -67,13 +81,16 @@ def make_plot(freq: str, ell_scaling="l0", logx=False, logy=False, outdir=None) 
         ax.set_xlim(10, 2100)
         ax.set_ylim(0.5 * np.min(cl_eff), 1.5 * np.max(cl_eff))
 
+        # Grid
+        ax.grid()
+
         # Labels
         ax.legend()
         ax.set_xlabel(r"$\ell$")
         ylabels = {
-            "l0": r"$C_{\ell}\ [\rm Jy^2/sr]$",
-            "l1": r"$\ell\;C_{\ell}\ [\rm Jy^2/sr]$",
-            "l2": r"$\ell^2\,/2\pi\;C_{\ell}\ [\rm Jy^2/sr]$",
+            "l0": r"$C_{\ell}$" + UNIT_STR[unit],
+            "l1": r"$\ell\;C_{\ell}$" + UNIT_STR[unit],
+            "l2": r"$\ell^2\,/2\pi\;C_{\ell}$" + UNIT_STR[unit],
         }
         ax.set_ylabel(ylabels[ell_scaling])
 
@@ -98,10 +115,13 @@ def make_plot(freq: str, ell_scaling="l0", logx=False, logy=False, outdir=None) 
 
 def main():
     outdir = Path("figures/")
+    unit = "uK^2.sr"
     freqs = set(["353", "545", "857"])
 
     for freq in freqs:
-        make_plot(freq, ell_scaling="l2", logx=False, logy=False, outdir=outdir)
+        make_plot(
+            freq, unit=unit, ell_scaling="l2", logx=False, logy=False, outdir=outdir
+        )
 
 
 if __name__ == "__main__":

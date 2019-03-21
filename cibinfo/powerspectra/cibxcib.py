@@ -273,8 +273,8 @@ class Planck14Model(CIBxCIB):
 
             # Apply the correction factor to the PR1 calibration
             self._Cl /= (
-                ut.PLANCK_PR1_CALCORR[str(self.freq1)]
-                * ut.PLANCK_PR1_CALCORR[str(self.freq2)]
+                ut.PLANCK_PR1PR3_CALCORR[str(self.freq1)]
+                * ut.PLANCK_PR1PR3_CALCORR[str(self.freq2)]
             )
         return self._Cl
 
@@ -330,7 +330,7 @@ class Maniyar18Model(CIBxCIB):
             # Possibly convert the units
             if self.unit in ["K^2.sr", "uK^2.sr"]:
                 self._Cl *= self.Jy2K[str(self.freq1)] * self.Jy2K[str(self.freq2)]
-                if self.unit == ["uK^2.sr"]:
+                if self.unit == "uK^2.sr":
                     self._Cl *= 1.0e12
 
             if self.unit == "MJy^2/sr":
@@ -401,8 +401,8 @@ class Planck14Data(CIBxCIB):
 
             # Apply the correction factor to the PR1 calibration
             self._Cl /= (
-                ut.PLANCK_PR1_CALCORR[str(self.freq1)]
-                * ut.PLANCK_PR1_CALCORR[str(self.freq2)]
+                ut.PLANCK_PR1PR3_CALCORR[str(self.freq1)]
+                * ut.PLANCK_PR1PR3_CALCORR[str(self.freq2)]
             )
 
         return self._Cl
