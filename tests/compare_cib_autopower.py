@@ -25,8 +25,8 @@ def make_plot(
     if not isinstance(freq, str):
         raise TypeError("freq must be str")
 
-    # model_names = ["Planck14Model", "Maniyar18Model", "Mak17Model", "Planck14Data"]
-    model_names = ["Planck14Model", "Mak17Model", "Planck14Data"]
+    model_names = ["Planck14Model", "Maniyar18Model", "Mak17Model", "Planck14Data"]
+    # model_names = ["Planck14Model", "Mak17Model", "Planck14Data"]
 
     _, ax = plt.subplots(figsize=(6, 4))
 

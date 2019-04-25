@@ -272,10 +272,10 @@ class Planck14Model(CIBxCIB):
                 self._Cl /= 1.0e12
 
             # Apply the correction factor to the PR1 calibration
-            self._Cl /= (
-                ut.PLANCK_PR1PR3_CALCORR[str(self.freq1)]
-                * ut.PLANCK_PR1PR3_CALCORR[str(self.freq2)]
-            )
+            # self._Cl /= (
+            #     ut.PLANCK_PR1PR3_CALCORR[str(self.freq1)]
+            #     * ut.PLANCK_PR1PR3_CALCORR[str(self.freq2)]
+            # )
         return self._Cl
 
     # Methods
@@ -400,10 +400,10 @@ class Planck14Data(CIBxCIB):
                 self._Cl /= 1.0e12
 
             # Apply the correction factor to the PR1 calibration
-            self._Cl /= (
-                ut.PLANCK_PR1PR3_CALCORR[str(self.freq1)]
-                * ut.PLANCK_PR1PR3_CALCORR[str(self.freq2)]
-            )
+            # self._Cl /= (
+            #     ut.PLANCK_PR1PR3_CALCORR[str(self.freq1)]
+            #     * ut.PLANCK_PR1PR3_CALCORR[str(self.freq2)]
+            # )
 
         return self._Cl
 
@@ -423,10 +423,10 @@ class Planck14Data(CIBxCIB):
                 self._dCl /= 1.0e12
 
             # Apply the correction factor to the PR1 calibration
-            self._dCl /= (
-                ut.PLANCK_PR1_CALCORR[str(self.freq1)]
-                * ut.PLANCK_PR1_CALCORR[str(self.freq2)]
-            )
+            # self._dCl /= (
+            #     ut.PLANCK_PR1PR3_CALCORR[str(self.freq1)]
+            #     * ut.PLANCK_PR1PR3_CALCORR[str(self.freq2)]
+            # )
 
         return self._dCl
 

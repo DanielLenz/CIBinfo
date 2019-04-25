@@ -44,13 +44,13 @@ def adjust_cl_length(cl, lmax=None, nside=None):
 # The convention is that PR2 = PR1 / C for the maps
 # For powerspectra, the conversion factor needs to be applied
 # once for each frequency
-# PLANCK_PR1PR2_CALCORR = {
-#     "100": 0.994,
-#     "217": 0.993,
-#     "353": 0.977,
-#     "545": 1.018,
-#     "857": 1.033,
-# }
+PLANCK_PR1PR2_CALCORR = {
+    "100": 0.994,
+    "217": 0.993,
+    "353": 0.977,
+    "545": 1.018,
+    "857": 1.033,
+}
 
 # Planck calibration correction to compare PR1 and PR3
 # The convention is that PR3 = PR1 / C for the maps
