@@ -176,7 +176,18 @@ class Planck18Data(CMBxCMB):
     @property
     def dl2Cl(self):
         if self._dl2Cl is None:
+            # Native unit is uK^2/sr
             self._dl2Cl = np.row_stack((self.raw_table["-dDl"], self.raw_table["+dDl"]))
+
+            if self.unit == "K^2.sr":
+                self._dl2Cl /= 1.0e12
+
+            if self.unit in ["MJy^2/sr", "Jy^2/sr"]:
+                self._dl2Cl /= 1.0e12  # from uK^2.sr to K^2.sr
+                self._dl2Cl *= self.K2Jy[str(self.freq)] ** 2
+
+            if self.unit == "MJy^2/sr":
+                self._dl2Cl /= 1.0e12
 
         return self._dl2Cl
 
